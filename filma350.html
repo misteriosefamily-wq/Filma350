@@ -1,0 +1,2264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Filma350 | Premium Movies</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      /* HUD theme: Red & Black */
+      --bg:#080708;          /* page base when overlays removed */
+      --bg-2:#0f0d0e;
+      --text:#e9e6e6;
+      --muted:#bdb7b7;
+      --heading:#fff;
+
+      --primary:#e31b23;     /* main red */
+      --primary-2:#ff4b4b;   /* lighter red */
+      --accent:#ff9b9b;
+      --ok:#23d997;
+
+      --glass:rgba(8,8,8,.66);
+      --glass-2:rgba(12,10,10,.44);
+      --border:1px solid rgba(227,27,35,.14);
+      --glass-blur:saturate(120%) blur(10px);
+
+      --brand:linear-gradient(135deg,#e31b23 0%,#ff4b4b 60%);
+      --brand-soft:linear-gradient(135deg,rgba(227,27,35,.14),rgba(255,75,75,.08));
+
+      --shadow-1:0 10px 30px rgba(0,0,0,.65),0 6px 16px rgba(227,27,35,.06);
+      --shadow-2:0 18px 50px rgba(0,0,0,.75),0 8px 26px rgba(227,27,35,.08);
+      --ring:0 0 0 2px rgba(227,27,35,.12),0 0 0 6px rgba(227,27,35,.06);
+
+      --radius-lg:18px;
+      --radius-md:12px;
+      --radius-sm:10px;
+      --pill:999px;
+
+      --transition:200ms cubic-bezier(.22,.61,.36,1);
+    }
+
+    html,body{height:100%}
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      /* Background restored: image + subtle winter/film radial overlays */
+      background:
+        radial-gradient(1200px 800px at 70% -10%,rgba(229,9,20,.18),transparent 60%),
+        radial-gradient(900px 700px at -10% 120%,rgba(255,209,102,.12),transparent 55%),
+        linear-gradient(180deg, rgba(234,246,251,0.06), rgba(214,234,248,0.04)),
+        url('https://img.freepik.com/free-photo/assortment-cinema-elements-red-background-with-copy-space_23-2148457848.jpg?semt=ais_hybrid&w=740&q=80') center center/cover fixed;
+      background-blend-mode: overlay, overlay, normal, normal;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    body::before, body::after { display: none !important; }
+
+    body::before {
+      content: none !important;
+      background: none !important;
+      animation: none !important;
+    }
+
+    /* --- WINTER SNOW EFFECT --- */
+    .snow {
+      pointer-events: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 99999;
+      background: none;
+    }
+
+    /* --- NAVBAR --- */
+    nav#main-navbar {
+      position:fixed;
+      top:0; left:0; width:100vw;
+      background:linear-gradient(180deg, rgba(6,6,6,0.88), rgba(12,12,12,0.82));
+      color:var(--text);
+      backdrop-filter:blur(6px) saturate(120%);
+      box-shadow:0 6px 30px rgba(0,0,0,.7), 0 2px 8px rgba(227,27,35,.06);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0.6rem 1.6rem;z-index:10000;
+      border-bottom:1px solid rgba(227,27,35,.08);
+    }
+    .navbar-logo {
+      display:flex;align-items:center;gap:.6rem;
+      font-family:Poppins,Inter,sans-serif;font-size:1.4rem;font-weight:800;
+      color:var(--primary);
+      letter-spacing:.6px;
+      text-shadow:0 2px 12px rgba(227,27,35,.12);
+    }
+    .navbar-logo img {
+      height:36px;width:auto;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.7), 0 4px 12px rgba(227,27,35,.12);
+    }
+    .navbar-links {
+      display:flex;gap:1.5rem;
+    }
+    .navbar-links a {
+      color:var(--text);text-decoration:none;font-weight:700;
+      padding:.35em .95em;border-radius:12px;
+      transition:background .18s,color .18s,transform .18s;
+    }
+    .navbar-links a:hover {
+      background:linear-gradient(90deg, rgba(227,27,35,.95), rgba(255,75,75,.92));
+      color:#fff;transform:translateY(-2px);
+    }
+
+    header {
+      padding-top:80px !important;
+    }
+
+    /* --- WINTER GLASS EFFECTS --- */
+    #promo-banner,
+    .movie-card,
+    #fav-box,
+    #side-menu,
+    #auth-form,
+    #profile-modal .profile-card,
+    #movie-modal #modal-content,
+    .human-card {
+      background:var(--glass) !important;
+      border:var(--border) !important;
+      box-shadow:var(--shadow-1) !important;
+      backdrop-filter:blur(8px) !important;
+    }
+
+    /* --- BUTTONS --- */
+    .play-btn,
+    #review-submit,
+    #auth-form button[type="submit"],
+    #signout-btn,
+    #welcome-btn {
+      background:var(--brand);
+      color:#fff;
+      border:none;
+      box-shadow:0 10px 34px rgba(227,27,35,.28);
+    }
+    .play-btn:hover,
+    #review-submit:hover,
+    #auth-form button[type="submit"]:hover,
+    #signout-btn:hover,
+    #welcome-btn:hover {
+      background:linear-gradient(90deg,#ff4b4b 0%,#e31b23 100%);
+      color:#fff;
+      transform:translateY(-2px) scale(1.02);
+    }
+
+    /* --- MOVIE CARDS --- */
+    .movie-card {
+      border-radius:var(--radius-md);
+      overflow:hidden;
+      border:1px solid rgba(227,27,35,.10);
+      box-shadow:var(--shadow-1);
+      transition:box-shadow .25s,transform .25s;
+    }
+    .movie-card:hover {
+      box-shadow:0 30px 80px rgba(0,0,0,.75), 0 12px 36px rgba(227,27,35,.08);
+      transform:translateY(-8px) scale(1.02);
+      border-color:rgba(227,27,35,.18);
+    }
+    .movie-card img {
+      border-bottom:1px solid rgba(255,255,255,.03);
+      filter:contrast(1.02) saturate(1.05);
+      background:linear-gradient(180deg,#0b0b0b,#191213);
+    }
+
+    /* --- CATEGORY BUTTONS --- */
+    #category-toggle,
+    .category-btn {
+      background:linear-gradient(90deg,#eaf6fb 0%,#d6eaf8 100%);
+      color:var(--heading);
+      border:1px solid rgba(79,195,247,.18);
+      font-weight:700;
+    }
+    .category-btn.active,
+    .category-btn:hover {
+      background:linear-gradient(90deg,#4fc3f7 0%,#81d4fa 100%);
+      color:#fff;
+      border-color:var(--primary-2);
+    }
+
+    /* --- MODALS --- */
+    #movie-modal,
+    #auth-modal,
+    #profile-modal,
+    #human-overlay {
+      background:rgba(30, 162, 219, 0.92) !important;
+      backdrop-filter:blur(8px) !important;
+    }
+
+    /* --- SNOWFLAKE STYLE --- */
+    .snowflake {
+      position: absolute;
+      top: -2em;
+      color: #fff;
+      font-size: 1.2em;
+      opacity: 0.85;
+      pointer-events: none;
+      text-shadow: 0 0 8px #fff, 0 0 16px #81d4fa;
+      user-select: none;
+      animation: snow-fall linear infinite;
+    }
+    @keyframes snow-fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0.7;
+      }
+    }
+
+    /* ===========================
+       Filma350 — Cinematic Glass UI
+       =========================== */
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      color:var(--text);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      /* Background restored: image + subtle winter/film radial overlays */
+      background:
+        radial-gradient(1200px 800px at 70% -10%,rgba(229,9,20,.18),transparent 60%),
+        radial-gradient(900px 700px at -10% 120%,rgba(255,209,102,.12),transparent 55%),
+        linear-gradient(180deg, rgba(234,246,251,0.06), rgba(214,234,248,0.04)),
+        url('https://img.freepik.com/free-photo/assortment-cinema-elements-red-background-with-copy-space_23-2148457848.jpg?semt=ais_hybrid&w=740&q=80') center center/cover fixed;
+      background-blend-mode: overlay, overlay, normal, normal;
+      overflow-x:hidden;
+    }
+    ::selection{background:rgba(229,9,20,.35);color:#fff}
+
+    body::before{
+      content:"";
+      position:fixed;inset:0;z-index:-2;
+      background:url('') center/cover fixed no-repeat;
+      filter:blur(14px) brightness(.6) contrast(1.05) saturate(1.1);
+    }
+    body::after{
+      content:"";
+      position:fixed;inset:0;z-index:-1;pointer-events:none;
+      background:
+        radial-gradient(40% 30% at 80% 5%,rgba(229,9,20,.16),transparent 60%),
+        radial-gradient(35% 30% at 10% 95%,rgba(255,209,102,.14),transparent 55%);
+    }
+
+    header{
+      position:relative;
+      padding:28px 16px 8px;
+      display:flex;flex-direction:column;align-items:center;gap:12px;
+    }
+    #main-logo{margin:0 !important;position:relative;text-align:center}
+    #main-logo::before{
+      content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      width:min(640px,92vw);height:260px;border-radius:50%;
+      background:var(--brand-soft);filter:blur(46px);z-index:0;
+    }
+    #main-logo img{
+      position:relative;z-index:1;
+      width:clamp(200px,32vw,360px) !important;height:auto;
+      border-radius:22px !important;
+      filter:drop-shadow(0 16px 60px rgba(229,9,20,.25)) drop-shadow(0 10px 26px rgba(0,0,0,.55)) !important;
+      transition:transform .5s cubic-bezier(.2,.8,.2,1), filter .5s;
+    }
+    #main-logo img:hover{transform:translateY(-4px) scale(1.02);filter:drop-shadow(0 22px 70px rgba(229,9,20,.35)) drop-shadow(0 12px 30px rgba(0,0,0,.65))}
+
+    #search-input{
+      display:block;margin:6px auto 0 !important;
+      width:min(720px,90vw) !important;
+      border:var(--border) !important;border-radius:var(--pill) !important;
+      padding:14px 18px 14px 52px !important;
+      font-size:1.05rem !important;color:var(--heading) !important;
+      background:
+        linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.05)) !important;
+      backdrop-filter:var(--glass-blur);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),var(--shadow-1) !important;
+      outline:none !important;transition:var(--transition);
+      background-image:url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='11' cy='11' r='7' stroke='%23cbd5e1' stroke-width='2'/%3E%3Cpath d='M21 21L16.65 16.65' stroke='%23cbd5e1' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-size:20px;background-position:18px 50%;
+    }
+    #search-input::placeholder{color:#cbd5e1 !important;opacity:.65 !important}
+    #search-input:focus{
+      box-shadow:var(--ring),0 10px 30px rgba(0,0,0,.4) !important;
+      border-color:rgba(255,255,255,.28) !important;
+      transform:translateY(-1px);
+    }
+
+    #category-dropdown{
+      position:relative !important;inset:auto !important;
+      display:flex !important;justify-content:center !important;align-items:center !important;
+      width:100%;margin:10px 0 14px !important;z-index:10;
+    }
+    #category-toggle{
+      all:unset;display:inline-flex;align-items:center;gap:10px;
+      padding:12px 18px;border-radius:var(--pill);cursor:pointer;
+      color:var(--heading);
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+      border:var(--border);backdrop-filter:var(--glass-blur);
+      box-shadow:var(--shadow-1);transition:var(--transition);
+    }
+    #category-toggle:hover{transform:translateY(-2px);box-shadow:0 18px 44px rgba(0,0,0,.45)}
+    #cat-arrow{font-size:1.25rem !important;transition:transform var(--transition) !important}
+
+    #category-menu{
+      display:none;position:absolute !important;top:calc(100% + 10px) !important;left:50% !important;transform:translateX(-50%) !important;
+      background:var(--glass);backdrop-filter:var(--glass-blur);border:var(--border);
+      border-radius:var(--radius-lg);padding:14px;box-shadow:var(--shadow-2);
+      width:min(720px,92vw);z-index:100;
+    }
+    .cat-grid{display:flex;flex-wrap:wrap;gap:10px}
+    #category-menu .category-btn{
+      appearance:none;cursor:pointer;
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+      border:var(--border);border-radius:16px;padding:10px 14px;margin:4px;
+      letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--text);
+      font-size:.86rem;transition:var(--transition);
+      backdrop-filter:var(--glass-blur);
+      flex:1 1 30%;
+      text-align:center;
+    }
+    #category-menu .category-btn.active,
+    #category-menu .category-btn:hover{
+      color:#fff;
+      background:linear-gradient(135deg,var(--cat-color, #ff4d57),rgba(255,255,255,.06) 140%);
+      box-shadow:0 14px 38px rgba(0,0,0,.45),0 8px 22px var(--cat-color, rgba(229,9,20,.4));
+      transform:translateY(-3px);
+    }
+    .category-btn[onclick*="All"]{ --cat-color:#79808c}
+    .category-btn[onclick*="Action"]{ --cat-color:#3a8dff}
+    .category-btn[onclick*="Horror"]{ --cat-color:#ff4d57}
+    .category-btn[onclick*="Comedy"]{ --cat-color:#ffd166}
+    .category-btn[onclick*="Animation"]{ --cat-color:#8a7dff}
+    .category-btn[onclick*="Dram"]{ --cat-color:#23d997}
+
+    #promo-banner{
+      width:min(920px,92vw) !important;margin:22px auto 4px !important;
+      background:linear-gradient(180deg, rgba(10,10,10,.78), rgba(18,12,12,.6)) !important;
+      border:1px solid rgba(227,27,35,.08) !important;border-radius:16px !important;
+      box-shadow:var(--shadow-2) !important;backdrop-filter:var(--glass-blur);
+      display:flex !important;flex-direction:column !important;align-items:center !important;gap:10px !important;
+      padding:1.6rem 1.6rem !important;text-align:center;
+    }
+    #promo-banner .promo-icon{height:54px;width:54px;animation:iconWave 2s infinite}
+    #promo-banner h2{color:var(--primary);letter-spacing:.06em;margin:.2rem 0 .5rem 0}
+    #promo-banner p{color:var(--text);opacity:.9;margin:0 0 .6rem 0}
+    #promo-banner a{
+      border:none;border-radius:16px;padding:.7rem 1.6rem;font-weight:800;color:#fff;text-decoration:none;cursor:pointer;
+      background:linear-gradient(135deg,#1da1f2 0%,#0f98ea 40%,#0a6fb1 100%);box-shadow:0 12px 30px rgba(17,133,221,.42);
+      transition:var(--transition);
+    }
+    #promo-banner a:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(17,133,221,.55)}
+
+    .movies{
+      width:min(1250px,92vw);margin:0 auto;
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:22px;padding:22px 0 80px;
+    }
+    .movie-card{
+      position:relative;overflow:hidden;border-radius:var(--radius-md);
+      background:var(--glass);backdrop-filter:var(--glass-blur);border:var(--border);
+      box-shadow:var(--shadow-1);
+      transform:translateY(0);transition:var(--transition);
+    }
+    .movie-card:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 30px 70px rgba(0,0,0,.55);border-color:rgba(255,255,255,.22)}
+    .movie-card img{width:100%;height:360px;object-fit:cover;display:block}
+    .movie-info{padding:14px 14px 16px}
+    .movie-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .movie-title{margin:0 0 6px 0;color:var(--heading);font-weight:800;font-size:1.05rem;letter-spacing:.02em}
+    .movie-genre{
+      display:inline-flex;align-items:center;gap:6px;margin:2px 0 10px 0;
+      padding:6px 10px;border-radius:999px;font-weight:800;font-size:.78rem;
+      color:#ff7b82;background:rgba(229,9,20,.12);border:1px solid rgba(229,9,20,.28);
+    }
+    .movie-rating{
+      display:inline-flex;align-items:center;gap:6px;margin:-6px 0 8px 0;
+      padding:5px 9px;border-radius:999px;font-weight:800;font-size:.82rem;
+      color:#ffe08a;background:rgba(255,208,106,.12);border:1px solid rgba(255,208,106,.28);
+    }
+    .movie-desc{
+      color:var(--muted);font-size:.92rem;line-height:1.45;margin:6px 0 4px;
+      display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;
+    }
+
+    .fav-heart-btn{
+      all:unset;display:grid;place-items:center;cursor:pointer;
+      width:36px;height:36px;border-radius:50%;
+      color:#ff5e6c;background:radial-gradient(circle at 30% 30%,rgba(255,94,108,.18),transparent 60%);
+      border:1px solid rgba(255,94,108,.35);transition:var(--transition);
+    }
+    .fav-heart-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,94,108,.35)}
+
+    .play-btn{
+      width:100%;margin-top:12px;border:none;border-radius:14px;
+      padding:12px 16px;cursor:pointer;color:#fff;font-weight:800;letter-spacing:.02em;
+      background:var(--brand);
+      box-shadow:0 12px 32px rgba(229,9,20,.35),inset 0 -2px 0 rgba(255,255,255,.18);
+      transition:var(--transition);
+    }
+    .play-btn:hover{transform:translateY(-2px);box-shadow:0 18px 44px rgba(229,9,20,.45)}
+
+    /* MODAL smaller, clearer, better title + close X */
+    #movie-modal{
+      display:none;position:fixed;inset:0;z-index:1000;
+      background:linear-gradient(180deg, rgba(2,2,2,.88), rgba(10,6,6,.92));
+      backdrop-filter:blur(8px);
+      align-items:center;justify-content:center;padding:18px;
+    }
+    #modal-content{
+      width:min(820px,94vw) !important;max-width:min(820px,94vw) !important;
+      background:linear-gradient(180deg, rgba(12,8,8,.96), rgba(18,10,10,.98));
+      border-radius:16px;border:1px solid rgba(227,27,35,.08);box-shadow:var(--shadow-2);
+      padding:0.9rem 0.9rem 1rem 0.9rem;position:relative;overflow:hidden;color:var(--text);
+    }
+    /* Header bar inside modal with title, genre chip, and close X */
+    #modal-header{
+      display:flex;align-items:center;gap:.5rem;margin:0 0 .6rem 0;padding:2px 2px 6px 2px;
+    }
+    #modal-title{
+      flex:1;min-width:0;margin:0;color:var(--heading);font-size:1.25rem;font-weight:800;letter-spacing:.02em;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    #modal-location{
+      display:inline-flex;align-items:center;gap:.35rem;padding:.35rem .6rem;border-radius:999px;
+      font-size:.85rem;color:#ffd166;background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.28);
+      white-space:nowrap;
+    }
+    #modal-close-btn{
+      position:static; margin-left:.4rem;
+      width:40px;height:40px;border-radius:12px;border:var(--border);
+      background:rgba(255,255,255,.06);color:#fff;display:grid;place-items:center;
+      cursor:pointer;transition:var(--transition);font-size:1.2rem;line-height:1;
+    }
+    #modal-close-btn:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(0,0,0,.45)}
+
+    /* Media area */
+    #modal-media{margin:0 0 .6rem 0}
+    #modal-img,#modal-yt,#modal-video{
+      width:100%;border-radius:14px;border:none;background:#000;margin:0 0 .75rem 0;
+      box-shadow:0 10px 28px rgba(0,0,0,.5);
+    }
+    #modal-yt,#modal-video{display:none;aspect-ratio:16/9;max-height:56vh}
+    #modal-img{display:block;object-fit:cover;max-height:56vh}
+
+    #modal-desc{color:var(--text);opacity:.92;margin:.2rem 0 .8rem 0;line-height:1.55}
+
+    /* Evaluation system: rating + reviews */
+    #rating-section{
+      margin:.4rem 0 1rem 0;display:flex;flex-direction:column;align-items:center;gap:.35rem;
+    }
+    .stars{
+      display:inline-flex;gap:6px;padding:6px 10px;border-radius:999px;
+      border:var(--border);
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+      box-shadow:var(--shadow-1);
+    }
+    .star{
+      all:unset;cursor:pointer;font-size:1.35rem;line-height:1;color:#8b8f98;transition:var(--transition);
+      text-shadow:0 0 0 rgba(0,0,0,0);
+    }
+    .star:hover{transform:translateY(-1px) scale(1.05)}
+    .star.active{color:#ffd166;text-shadow:0 0 18px rgba(255,209,102,.35)}
+    .rating-meta{font-size:.92rem;color:var(--muted)}
+
+    #reviews-section{margin-top:.6rem}
+    .reviews-title{margin:.3rem 0 .5rem 0;color:#ffd166}
+    #reviews-count{color:var(--muted);font-weight:600;margin-left:.35rem}
+    #reviews-list .empty{color:var(--muted);font-size:.95rem;margin:.3rem 0 .6rem 0;text-align:center}
+    .review-item{
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+      border:var(--border);border-radius:14px;padding:.6rem .7rem;margin:.45rem 0;
+      display:flex;gap:.7rem;align-items:flex-start;
+    }
+    .review-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.18)}
+    .review-body{flex:1}
+    .review-meta{display:flex;align-items:center;gap:.4rem;color:#cbd5e1;font-weight:800;font-size:.9rem;margin-bottom:.1rem}
+    .review-meta .time{color:var(--muted);font-weight:600;font-size:.85rem}
+    .review-text{color:#e8eaef;line-height:1.45;white-space:pre-wrap}
+    .review-delete{
+      all:unset;cursor:pointer;font-size:1rem;color:#ff7b82;padding:.2rem .45rem;border-radius:10px;
+      background:rgba(255,94,108,.12);border:1px solid rgba(255,94,108,.28);
+      display:inline-flex;align-items:center;gap:.25rem;transition:var(--transition)
+    }
+    .review-delete:hover{transform:translateY(-1px)}
+    #review-form{
+      margin-top:.5rem;background:rgba(255,255,255,.04);border:var(--border);border-radius:14px;padding:.6rem .7rem
+    }
+    #review-input{
+      width:100%;min-height:80px;max-height:160px;resize:vertical;
+      border:1px solid rgba(255,255,255,.16);border-radius:12px;
+      background:rgba(255,255,255,.06);color:#fff;padding:.6rem .7rem;outline:none;font-size:1rem;
+      transition:var(--transition)
+    }
+    #review-input:focus{box-shadow:var(--ring)}
+    .review-actions{display:flex;align-items:center;justify-content:space-between;margin-top:.45rem}
+    #review-chars{color:var(--muted);font-size:.9rem}
+    #review-submit{
+      border:none;border-radius:12px;padding:.55rem 1rem;font-weight:800;cursor:pointer;color:#fff;
+      background:var(--brand);box-shadow:0 10px 28px rgba(229,9,20,.35);transition:var(--transition)
+    }
+    #review-submit:hover{transform:translateY(-1px)}
+
+    #modal-share{margin-top:.6rem;display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+    #modal-share a{
+      display:inline-flex;align-items:center;gap:.6rem;text-decoration:none;font-weight:800;
+      padding:.62em 1.1em;border-radius:12px;border:1px solid rgba(255,255,255,.15);
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+      color:#fff;transition:var(--transition);
+    }
+    #modal-share a:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.4)}
+    #modal-share img{height:1.2em;width:1.2em}
+
+    #menu-toggle{
+      position:fixed !important;top:20px !important;right:20px !important;z-index:4000;
+      padding:10px;border-radius:12px;border:1px solid rgba(227,27,35,.08);
+      background:linear-gradient(180deg, rgba(10,10,10,.72), rgba(6,6,6,.6));box-shadow:var(--shadow-1);
+      cursor:pointer;transition:var(--transition);
+    }
+    #menu-toggle:hover{transform:translateY(-2px);box-shadow:0 18px 44px rgba(0,0,0,.45)}
+    #menu-toggle div{width:26px !important;height:2px !important;background:var(--heading) !important;margin:6px 0 !important;border-radius:2px !important;transition:var(--transition)}
+    #menu-toggle.animated{transform:rotate(90deg) scale(1.1)}
+
+    #side-menu{
+      position:fixed;top:0;right:0;height:100vh;width:min(320px,90vw);
+      transform:translateX(100%);opacity:0;display:block;z-index:4000;
+      background:linear-gradient(180deg, rgba(6,6,6,.98), rgba(10,6,6,.96));
+      color:var(--text);border-left:1px solid rgba(227,27,35,.06);
+      box-shadow:-8px 0 44px rgba(0,0,0,.85);
+      padding:2.2rem 1.2rem 1.5rem 1.2rem;
+      backdrop-filter:blur(10px) saturate(110%);transition:transform var(--transition), opacity 180ms ease;
+    }
+    #side-menu.open{transform:translateX(0);opacity:1}
+    #side-menu h3{margin:.2rem 0 .7rem 0;color:var(--accent)}
+    #side-menu button{
+      border:none;border-radius:16px;padding:.7rem 1rem;font-weight:800;cursor:pointer;
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+      border:var(--border);color:#fff;transition:var(--transition);width:100%;
+    }
+    #side-menu button:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.45)}
+    #side-menu .close{
+      position:absolute;top:12px;right:12px;width:42px;height:42px;border-radius:12px;
+      background:rgba(255,255,255,.06);border:var(--border);color:#fff;display:grid;place-items:center;
+      font-size:1.4rem;cursor:pointer;
+    }
+    .side-section{margin-top:1.2rem}
+
+    #fav-box{
+      display:none;position:fixed;top:70px;right:340px;z-index:4100;
+      background:rgba(10,10,10,.72);border:1px solid rgba(227,27,35,.06);
+      border-radius:12px;backdrop-filter:var(--glass-blur);
+      box-shadow:var(--shadow-2);min-width:260px;max-width:90vw;
+      color:var(--text);padding:1rem;
+    }
+    .flyout-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+    .flyout-header button{
+      all:unset;cursor:pointer;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
+      background:rgba(255,255,255,.08);border:var(--border)
+    }
+    #fav-list > div{
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+      border:var(--border);border-radius:12px;padding:.5rem .6rem;margin-bottom:.6rem;
+      display:flex;align-items:center;gap:.7rem;
+    }
+    #fav-list img{width:38px;height:38px;border-radius:8px;object-fit:cover}
+
+    #auth-modal,#profile-modal{
+      display:none;position:fixed;inset:0;z-index:99999;
+      background:rgba(6,10,16,.88);backdrop-filter:blur(6px);
+      align-items:center;justify-content:center;padding:22px;
+    }
+    #auth-form, #profile-modal .profile-card{
+      background:linear-gradient(180deg,rgba(23,26,34,.85),rgba(16,20,28,.92));
+      border:var(--border);border-radius:20px;box-shadow:var(--shadow-2);color:var(--text);
+      padding:2rem 2.2rem;min-width:280px;text-align:center;
+    }
+    #auth-form h2{color:var(--accent);margin:0 0 1rem 0}
+    #auth-form input{
+      width:100%;max-width:420px;display:block;margin:0 auto 12px auto;
+      padding:.75rem .9rem;border-radius:12px;border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.06);color:#fff;font-size:1.05rem;outline:none;
+      transition:var(--transition);
+    }
+    #auth-form input:focus{box-shadow:var(--ring)}
+    #auth-form button{
+      border:none;border-radius:14px;padding:.7rem 1.2rem;margin:.2rem;
+      font-weight:800;cursor:pointer;transition:var(--transition)
+    }
+    #auth-form button[type="submit"]{background:var(--brand);color:#fff;box-shadow:0 10px 28px rgba(229,9,20,.35)}
+    #auth-form #auth-cancel{background:rgba(255,255,255,.08);border:var(--border);color:#fff}
+    #auth-msg{color:var(--accent);min-height:1.5em;margin-top:.6rem}
+
+    .profile-card{position:relative}
+    .profile-card .profile-close{
+      position:absolute;top:10px;right:14px;width:40px;height:40px;border-radius:12px;border:var(--border);
+      background:rgba(255,255,255,.06);color:#fff;display:grid;place-items:center;cursor:pointer;
+    }
+    .profile-card .profile-avatar img{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--accent)}
+    #profile-username{color:var(--accent);font-size:1.15rem;font-weight:800;margin:1rem 0}
+    #signout-btn{
+      border:none;border-radius:14px;padding:.7rem 1.2rem;font-weight:800;cursor:pointer;
+      background:var(--brand);color:#fff;box-shadow:0 10px 28px rgba(229,9,20,.35)
+    }
+
+    #discord-float{
+      position:fixed !important;bottom:24px !important;right:24px !important;z-index:2000;
+      padding:12px 18px !important;border-radius:18px !important;
+      background:linear-gradient(135deg,#1f1b1b 0%,#2b0f0f 60%) !important;
+      border:1px solid rgba(227,27,35,.08) !important;color:#fff;text-decoration:none;
+      display:flex;align-items:center;gap:.6rem;box-shadow:0 20px 50px rgba(0,0,0,.6) !important;
+      transition:var(--transition);font-weight:700;
+    }
+    #discord-float:hover{transform:translateY(-4px) scale(1.02) !important;box-shadow:0 26px 70px rgba(227,27,35,.14) !important}
+
+    #welcome-overlay{
+      position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(180deg, rgba(8,6,6,.92), rgba(6,6,6,.96));
+      backdrop-filter:blur(6px) saturate(110%);transition:opacity .7s;opacity:1;
+    }
+    .welcome-card{text-align:center}
+    .welcome-card .emoji{font-size:3.5rem;filter:grayscale(0);text-shadow:0 6px 18px rgba(227,27,35,.25)}
+    .welcome-card h1{
+      font-family:Poppins,Inter,system-ui;
+      font-size:2.4rem;margin:.6em 0 .15em 0;
+      background: linear-gradient(90deg, #ffb3b3 20%, #e31b23 70%);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+      letter-spacing:2px;font-weight:800;text-shadow:0 4px 24px #000a;
+    }
+    .welcome-card p{color:#ffe066;font-size:1.15rem;margin:.2rem 0 1.2rem 0}
+    #welcome-btn{
+      border:none;border-radius:14px;padding:.8rem 2rem;font-weight:800;cursor:pointer;color:#fff;
+      background:linear-gradient(90deg,#e31b23 0%,#ff4b4b 100%);box-shadow:0 14px 38px rgba(227,27,35,.28);transition:var(--transition)
+    }
+    #welcome-btn:hover{transform:translateY(-2px)}
+
+    *::-webkit-scrollbar{height:10px;width:10px}
+    *::-webkit-scrollbar-track{background:rgba(255,255,255,.06);border-radius:10px}
+    *::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.08));border-radius:10px;border:1px solid rgba(255,255,255,.18)}
+    *::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.12))}
+
+    @media (prefers-reduced-motion:reduce){
+      *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+    }
+    @media (max-width:900px){
+      #modal-content{padding:0.8rem}
+    }
+    @media (max-width:620px){
+      .movies{grid-template-columns:repeat(2,minmax(0,1fr))}
+      #fav-box{right:20px}
+    }
+    @media (max-width:460px){
+      .movies{grid-template-columns:1fr}
+      #menu-toggle{top:16px !important;right:16px !important}
+      #discord-float{right:16px !important;bottom:16px !important}
+    }
+
+    @keyframes iconWave{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+    /* Human verification overlay */
+    #human-overlay{
+      position:fixed;inset:0;z-index:120000;
+      display:none;align-items:center;justify-content:center;padding:22px;
+      background:radial-gradient(90% 75% at 50% 10%,rgba(229,9,20,.25),transparent 60%),rgba(6,10,16,.94);
+      backdrop-filter:blur(8px);
+      transition:opacity .45s;opacity:1;
+    }
+    #human-overlay.hidden{opacity:0}
+
+    .human-card{
+      width:min(460px,92vw);
+      background:linear-gradient(180deg,rgba(23,26,34,.88),rgba(16,20,28,.94));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.45);
+      padding:1.2rem 1.2rem 1.1rem;text-align:center;color:var(--text);
+    }
+    .human-card h2{
+      margin:.2rem 0 .3rem;color:var(--accent);font-family:Poppins,Inter,system-ui;font-weight:800;
+    }
+    .human-sub{opacity:.9;margin:0 0 .9rem 0}
+
+    .hold-area{margin:.3rem 0 .8rem}
+    #hold-btn{
+      position:relative;width:100%;
+      border:none;border-radius:14px;padding:0.9rem 1rem;font-weight:800;cursor:pointer;
+      color:#fff;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+      border:var(--border);box-shadow:var(--shadow-1);transition:var(--transition);
+    }
+    #hold-btn:hover{transform:translateY(-2px)}
+    #hold-btn .bar{
+      position:absolute;left:6px;right:6px;bottom:6px;height:7px;border-radius:999px;
+      background:rgba(255,255,255,.12);overflow:hidden;
+    }
+    #hold-btn .bar-fill{
+      width:0%;height:100%;background:var(--brand);box-shadow:0 0 14px rgba(229,9,20,.35) inset;
+      transition:width .08s linear;
+    }
+    .hold-help{margin:.35rem 0 0 0;color:var(--muted);font-size:.92rem}
+
+    .or-line{
+      display:flex;align-items:center;gap:.6rem;color:#cbd5e1;opacity:.9;margin:.6rem 0;
+    }
+    .or-line::before,.or-line::after{
+      content:"";flex:1;height:1px;background:rgba(255,255,255,.14);border-radius:2px;
+    }
+
+    .puzzle-area{
+      display:grid;grid-template-columns:1fr auto;gap:.5rem;align-items:center;
+      background:rgba(255,255,255,.04);border:var(--border);border-radius:14px;padding:.6rem .7rem;
+    }
+    .puzzle-area label{grid-column:1 / -1;color:#e6e9ef;font-weight:700}
+    #pz-input{
+      min-width:0;border:1px solid rgba(255,255,255,.16);border-radius:12px;
+      background:rgba(255,255,255,.06);color:#fff;padding:.55rem .7rem;outline:none;font-size:1rem;
+    }
+    #pz-input:focus{box-shadow:var(--ring)}
+    #pz-check{
+      border:none;border-radius:12px;padding:.55rem 1rem;font-weight:800;cursor:pointer;color:#fff;
+      background:var(--brand);box-shadow:0 10px 28px rgba(229,9,20,.35);transition:var(--transition)
+    }
+    #pz-check:hover{transform:translateY(-1px)}
+    #pz-msg{grid-column:1 / -1;font-size:.95rem;margin-top:.1rem}
+    /* --- Animation Improvements --- */
+
+    /* Fade-in for main content */
+    body, #welcome-overlay, #human-overlay, #movie-modal, #profile-modal, #auth-modal, #fav-box, #side-menu {
+      animation: fadeIn 0.7s cubic-bezier(.22,.61,.36,1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px);}
+      to   { opacity: 1; transform: none;}
+    }
+
+    /* Movie card hover: pop and glow */
+    .movie-card {
+      transition: box-shadow .35s, transform .35s, border-color .25s;
+    }
+    .movie-card:hover {
+      transform: translateY(-10px) scale(1.035) rotate(-1deg);
+      box-shadow: 0 30px 80px 0 rgba(229,9,20,.18), 0 10px 40px rgba(0,0,0,.45);
+      border-color: var(--primary-2);
+    }
+
+    /* Movie card image: subtle zoom on hover */
+    .movie-card img {
+      transition: transform .7s cubic-bezier(.22,.61,.36,1);
+    }
+    .movie-card:hover img {
+      transform: scale(1.07) rotate(-1deg);
+    }
+
+    /* Play button: pulse animation */
+    .play-btn {
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .play-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      background: radial-gradient(circle, rgba(255,255,255,.12) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity .4s;
+      z-index: 0;
+      pointer-events: none;
+      animation: playPulse 2.5s infinite;
+    }
+    .play-btn:hover::before {
+      opacity: 1;
+    }
+    @keyframes playPulse {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Modal pop-in animation */
+    #movie-modal[style*="display: flex"] #modal-content,
+    #profile-modal[style*="display: flex"] .profile-card,
+    #auth-modal[style*="display: flex"] #auth-form {
+      animation: modalPop .5s cubic-bezier(.22,.61,.36,1);
+    }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(.92) translateY(30px);}
+      to   { opacity: 1; transform: none;}
+    }
+
+    /* Category dropdown: smooth slide */
+    #category-menu {
+      transition: opacity .35s, transform .35s;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(18px) scale(.98);
+    }
+    #category-menu[style*="display: block"] {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+
+    /* Heart/favorite button: bounce on click */
+    .fav-heart-btn:active {
+      animation: favBounce .3s cubic-bezier(.22,.61,.36,1);
+    }
+    @keyframes favBounce {
+      0% { transform: scale(1);}
+      40% { transform: scale(1.3);}
+      100% { transform: scale(1);}
+    }
+
+    /* Discord button: wiggle on hover */
+    #discord-float:hover {
+      animation: discordWiggle .5s;
+    }
+    @keyframes discordWiggle {
+      0% { transform: rotate(-2deg) scale(1.02);}
+      20% { transform: rotate(2deg) scale(1.04);}
+      40% { transform: rotate(-2deg) scale(1.06);}
+      60% { transform: rotate(2deg) scale(1.04);}
+      80% { transform: rotate(-2deg) scale(1.02);}
+      100% { transform: none;}
+    }
+
+    /* Welcome overlay emoji: bounce */
+    .welcome-card .emoji {
+      animation: emojiBounce 2.2s infinite cubic-bezier(.22,.61,.36,1);
+    }
+    @keyframes emojiBounce {
+      0%, 100% { transform: translateY(0);}
+      30% { transform: translateY(-12px) scale(1.12);}
+      50% { transform: translateY(0);}
+    }
+
+    /* Review delete: shake on hover */
+    .review-delete:hover {
+      animation: shake .3s;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0);}
+      20% { transform: translateX(-3px);}
+      40% { transform: translateX(3px);}
+      60% { transform: translateX(-2px);}
+      80% { transform: translateX(2px);}
+      100% { transform: translateX(0);}
+    }
+
+    /* Side menu: slide in */
+    #side-menu {
+      transition: transform .45s cubic-bezier(.22,.61,.36,1), opacity .25s;
+    }
+    #side-menu.open {
+      animation: sideSlideIn .5s cubic-bezier(.22,.61,.36,1);
+    }
+    @keyframes sideSlideIn {
+      from { transform: translateX(100%) scale(.98); opacity: 0;}
+      to   { transform: none; opacity: 1;}
+    }
+
+    /* Human verification: card pop */
+    .human-card {
+      animation: modalPop .6s cubic-bezier(.22,.61,.36,1);
+    }
+
+    /* Subtle background floating animation */
+    body::before {
+      animation: bgFloat 18s ease-in-out infinite alternate;
+    }
+    @keyframes bgFloat {
+      from { background-position: center 0;}
+      to   { background-position: center 40px;}
+    }
+
+    /* ...existing code... */
+  </style>
+</head>
+<body>
+  <!-- HUMAN VERIFICATION OVERLAY -->
+  <div id="human-overlay" role="dialog" aria-modal="true" aria-labelledby="human-title">
+    <div class="human-card">
+      <h2 id="human-title">Verifikim i shpejtë</h2>
+      <p class="human-sub">Konfirmo që je njeri për të vazhduar</p>
+
+      <div class="hold-area" aria-live="polite">
+        <button id="hold-btn" type="button" aria-describedby="hold-help">
+          Mbaje butonin për 2 sekonda
+          <span class="bar"><span class="bar-fill" id="hold-fill"></span></span>
+        </button>
+        <div id="hold-help" class="hold-help">Lësho herët për të rifilluar.</div>
+      </div>
+
+      <div class="or-line">ose</div>
+
+      <div class="puzzle-area">
+        <label for="pz-input">Sa bën <span id="pz-a">?</span> + <span id="pz-b">?</span> =</label>
+        <input id="pz-input" inputmode="numeric" pattern="[0-9]*" placeholder="Shkruaj përgjigjen">
+        <button id="pz-check" type="button">Verifiko</button>
+        <div id="pz-msg" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="welcome-overlay">
+    <div class="welcome-card">
+      <span class="emoji">🍿</span>
+      <h1>Mirësevini në Filma350</h1>
+      <p>Shijo filmat më të mirë!</p>
+      <button id="welcome-btn">Hyr në faqe</button>
+    </div>
+  </div>
+
+  <header>
+    <h1 id="main-logo">
+      <img src="filma350.png" alt="Filma350 Logo">
+    </h1>
+    <input type="text" id="search-input" placeholder="🔍 Search movies..." />
+  </header>
+
+  <div id="menu-toggle" title="Menu">
+    <div></div><div></div><div></div>
+  </div>
+
+  <nav id="side-menu" aria-label="Sidebar">
+    <button class="close" id="side-close-btn" aria-label="Close menu">×</button>
+    <div class="side-section">
+      <h3>Favorites</h3>
+      <button onclick="toggleFavBox()">❤️ Show Favorites</button>
+    </div>
+    <div id="auth-section" class="side-section"></div>
+  </nav>
+
+  <div id="fav-box" class="flyout" role="dialog" aria-label="Favorites">
+    <div class="flyout-header">
+      <strong>❤️ Your Favorites</strong>
+      <button id="fav-close" aria-label="Close favorites">×</button>
+    </div>
+    <div id="fav-list"></div>
+    <div id="fav-empty">No favorites yet.</div>
+  </div>
+
+  <div id="category-dropdown">
+    <button id="category-toggle" aria-expanded="false">
+      <span id="cat-arrow">⇛</span>
+      <span>Categories</span>
+    </button>
+    <div id="category-menu" role="menu">
+      <div class="cat-grid">
+        <button class="category-btn active" onclick="filterMovies('All')" role="menuitem">
+          <span class="cat-text">All Genres</span>
+        </button>
+        <button class="category-btn" onclick="filterMovies('Action')" role="menuitem">
+          <span class="cat-text">Action</span>
+        </button>
+        <button class="category-btn" onclick="filterMovies('Horror')" role="menuitem">
+          <span class="cat-text">Horror</span>
+        </button>
+        <button class="category-btn" onclick="filterMovies('Comedy')" role="menuitem">
+          <span class="cat-text">Comedy</span>
+        </button>
+        <button class="category-btn" onclick="filterMovies('Animation')" role="menuitem">
+          <span class="cat-text">Animation</span>
+        </button>
+        <button class="category-btn" onclick="filterMovies('Drama')" role="menuitem">
+          <span class="cat-text">Drama</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <section id="promo-banner">
+    <img src="https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/twitter.svg" alt="Twitter" class="promo-icon">
+    <h2>Follow us on Twitter!</h2>
+    <p>Për më shumë njoftime dhe lajme të reja, na ndiqni në Twitter!</p>
+    <a href="https://x.com/filma350" target="_blank" rel="noopener">Twitter</a>
+  </section>
+
+  <section class="movies" id="movies-list"></section>
+
+  <div id="movie-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div id="modal-content">
+      <div id="modal-header">
+        <h2 id="modal-title"></h2>
+        <div id="modal-location"></div>
+        <button id="modal-close-btn" aria-label="Close modal">×</button>
+      </div>
+
+      <div id="modal-media">
+        <img id="modal-img" src="" alt="">
+        <video id="modal-video" controls></video>
+        <iframe id="modal-yt" allowfullscreen></iframe>
+      </div>
+
+      <p id="modal-desc"></p>
+
+      <div id="rating-section">
+        <div id="rating-stars" class="stars" aria-label="Rate this movie"></div>
+        <div class="rating-meta"><span id="your-rating">Your rating: —</span> · <span id="avg-rating">Average: —</span></div>
+      </div>
+
+      <div id="reviews-section">
+        <h3 class="reviews-title">Reviews <span id="reviews-count"></span></h3>
+        <div id="reviews-list"></div>
+        <div id="review-form">
+          <textarea id="review-input" placeholder="Write a review (5–400 chars)"></textarea>
+          <div class="review-actions">
+            <span id="review-chars">0/400</span>
+            <button id="review-submit" type="button">Post</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="modal-share">
+        <a id="share-facebook" href="#" target="_blank" rel="noopener">
+          <img src="https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/facebook.svg" alt="Facebook"> Facebook
+        </a>
+        <a id="share-twitter" href="#" target="_blank" rel="noopener">
+          <img src="https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/twitter.svg" alt="Twitter"> Twitter
+        </a>
+        <a id="share-whatsapp" href="#" target="_blank" rel="noopener">
+          <img src="https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/whatsapp.svg" alt="WhatsApp"> WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <a id="discord-float"
+     href="https://discord.gg/J6xd5ZQgc4"
+     target="_blank"
+     rel="noopener noreferrer"
+     role="button"
+     aria-label="Join Filma350 Discord"
+     title="Join Filma350 on Discord">
+    <span class="df-icon"><img src="https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/discord.svg" alt=""></span>
+    <span class="df-text">Filma350 Discord</span>
+    <span class="df-cta">Join</span>
+  </a>
+
+  <div id="auth-modal">
+    <form id="auth-form">
+      <h2 id="auth-title">Login</h2>
+      <input id="auth-user" type="text" placeholder="Username" required>
+      <input id="auth-pass" type="password" placeholder="Password" required>
+      <button type="submit">Submit</button>
+      <button type="button" id="auth-cancel">Cancel</button>
+      <div id="auth-msg"></div>
+    </form>
+  </div>
+
+  <div id="profile-modal">
+    <div class="profile-card">
+      <button class="profile-close" id="profile-close-btn" aria-label="Close profile">×</button>
+      <div class="profile-avatar">
+        <label for="profile-pic-input" style="cursor:pointer">
+          <img id="profile-pic" src="https://ui-avatars.com/api/?name=User&background=ffe066&color=e50914&rounded=true&size=128" alt="Profile">
+          <input id="profile-pic-input" type="file" accept="image/*" style="display:none;">
+        </label>
+      </div>
+      <div id="profile-username"></div>
+      <button id="signout-btn" type="button">Sign Out</button>
+    </div>
+  </div>
+
+  <script>
+    // Movies array
+    const movies = [
+      {
+        title: "The Conjuring",
+        genre: "Horror",
+        image: "https://imgs.search.brave.com/iLzXTZEA6_WW6VrjLSMCQC29nOcdo5auo4M6zh-FQsQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL00v/TVY1Qk1qRXhORFF3/TWpNek5WNUJNbDVC/YW5CblhrRnRaVGN3/TVRRNE5UY3hPUUBA/Ll9WMV9RTDc1X1VY/ODIwXy5qcGc",
+        desc: "Një familje e New England ka takime të ngushta me shpirtrat e tmerrshëm që ndjekin shtëpinë e tyre në fermë. Për të hequr qafe pranitë e liga, familja është e detyruar të kërkojë ndihmën e hetuesve Ed (Patrick Wilson) dhe Lorraine Warren (Vera Farmiga), ekspertë të fenomeneve okulte.",
+        video: "https://voe.sx/e/xcjrpxk99tcy"
+      },
+      {
+        title: "The Conjuring 2",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/zEqyD0SBt6HL7W9JQoWwtd5Do1T.jpg",
+        desc: "Ed dhe Lorraine Warren udhëtojnë në Londër për të ndihmuar një nënë të vetme dhe katër fëmijët e saj që janë të terrorizuar nga shpirtrat e këqij në shtëpinë e tyre.",
+        video: "https://voe.sx/e/dlnk1alnfkqa"
+      },
+      {
+        title: "The Conjuring: The Devil Made Me Do It",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/xbSuFiJbbBWCkyCCKIMfuDCA4yV.jpg",
+        desc: "Ed dhe Lorraine Warren hetojnë një rast të vrasjes ku i dyshuari pretendon se është pushtuar nga një demon. Një histori e tmerrshme e bazuar në ngjarje të vërteta.",
+        video: "https://voe.sx/e/8k2nlfot9xr1"
+      },
+      {
+        title: "Toy Story",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg",
+        desc: "Të udhëhequra nga Woody, lodrat e Andit jetojnë të lumtura në dhomën e tij derisa ditëlindja e Andit të sjellë Buzz Lightyear në skenë. I frikësuar se mos humbasë vendin e tij në zemrën e Andit, Woody komploton kundër Buzz. Por kur rrethanat ndajnë Buzz dhe Woody nga pronari i tyre, dyshja përfundimisht mëson të lënë mënjanë dallimet e tyre.",
+        video: "https://voe.sx/e/wpfdux1jqanh"
+      },
+      {
+        title: "Toy Story 2",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/eVGu0zsezaSCuN67zgNhzjeNI9Z.jpg",
+        desc: "Andi niset për në Kampin e Kaubojve, duke i lënë lodrat e tij në vullnetin e tyre. Gjërat kthehen në shpejtësi kur një koleksionist i ngulët lodrash i quajtur Al McWhiggen, pronar i Al’s Toy Barn rrëmben Woodin. Lodrat e Andit kryejnë një mision të guximshëm shpëtimi, Buzz Lightyear takohet me ndeshjen e tij dhe Woody duhet të vendosë se ku i përkasin vërtet ai dhe zemra e tij.",
+        video: "https://voe.sx/e/kauzorwfbhfi"
+      },
+      {
+        title: "Toy Story 3",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/AbbXspMOwdvwWZgVN0nabZq03Ec.jpg",
+        desc: "Woody, Buzz dhe lodrat e tjera të Andit nuk janë luajtur me vite. Me Andin gati për të shkuar në kolegj, banda e gjen veten të lënë aksidentalisht në një qendër të keqe ditore. Lodrat duhet të bashkohen për të ikur dhe për t’u kthyer në shtëpi te Andi.",
+        video: "https://voe.sx/e/kqmksecnrxov"
+      },
+      {
+        title: "Toy Story 4",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/w9kR8qbmQ01HwnvK4alvnQ2ca0L.jpg",
+        desc: "Woody ka qenë gjithmonë i sigurt për vendin e tij në botë dhe se prioriteti i tij është të kujdeset për fëmijën e tij, qoftë Andy apo Bonnie. Por kur Bonnie shton një lodër të re të quajtur “Forky” në dhomën e saj, një aventurë udhëtimi së bashku me miqtë e vjetër dhe të rinj do t’i tregojë Woodit se sa e madhe mund të jetë bota për një lodër.",
+        video: "https://voe.sx/e/w6clyi4gu4cc"
+      },
+      {
+        title: "Rambo: Last Blood",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/kTQ3J8oTTKofAVLYnds2cHUz9KO.jpg",
+        desc: "Mbesa e John Rambo është rrëmbyer. Një veteran i luftës, Rambo është i detyruar të kalojë kufijtë midis Shteteve të Bashkuara dhe Meksikës për ta shpëtuar dhe për ta sjellë në shtëpi. Gjatë hulumtimit të tij, ai do të përballet me një nga kartelet më të pamëshirshme meksikane, të përfshirë në tregtinë e vaj.",
+        video: "https://voe.sx/e/eufonmsi5jfu"
+      },
+      {
+        title: "The Fast and the Furious: Tokyo Drift",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/cm2ffqb3XovzA5ZSzyN3jnn8qv0.jpg",
+        desc: "Një adoleshent amerikan dërgohet në Tokio, ku zbulon botën e garave të paligjshme të makinave drift dhe përfshihet në një konflikt të rrezikshëm me mafian japoneze.",
+        video: "https://voe.sx/e/ysznthx884by"
+      },
+      {
+        title: "Kung Fu Panda",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/wWt4JYXTg5Wr3xBW2phBrMKgp3x.jpg",
+        desc: "Kur Lugina e Paqes kërcënohet, panda dembel Po zbulon fatin e tij si “i zgjedhuri” dhe stërvitet për t’u bërë një hero kung fu, por transformimi i dembelit të pahijshëm në një luftëtar trim nuk do të jetë i lehtë. I takon Mjeshtrit Shifu dhe Furious Five – Tigres, Crane, Mantis, Viper dhe Monkey – ta provojnë.",
+        video: "https://voe.sx/e/g4d8zzhhxl1b"
+      },
+      {
+        title: "Kung Fu Panda 2",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/mtqqD00vB4PGRt20gWtGqFhrkd0.jpg",
+        desc: "Po tani po jeton ëndrrën e tij si Luftëtari i Dragoit, duke mbrojtur Luginën e Paqes së bashku me miqtë e tij dhe kolegët e tij mjeshtër të kung fu-së, Pesë të furishëm – Tigres, Crane, Mantis, Viper dhe Majmun. Por jeta e re e mahnitshme e Po kërcënohet nga shfaqja e një zuzari të frikshëm, i cili planifikon të përdorë një armë sekrete, të pandalshme për të pushtuar Kinën dhe për të shkatërruar kung fu-në. Po dhe The Furious Five i takon të udhëtojnë nëpër Kinë për të përballuar këtë kërcënim dhe për ta mposhtur atë. Por si mundet Po të ndalojë një armë që mund të ndalojë kung fu-në?",
+        video: "https://voe.sx/e/tcam0d1hfhdg"
+      },
+      {
+        title: "Kung Fu Panda 3",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/pKrwkydrXKDX9rpMdzwqFQQLRfI.jpg",
+        desc: "Po must face two hugely epic threats: one supernatural and the other a little closer to home. The third chapter of the legendary Kung Fu Panda saga.",
+        video: "https://voe.sx/e/1so4h9ggvrml"
+      },
+      {
+        title: "Kung Fu Panda 4",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/wkfG7DaExmcVsGLR4kLouMwxeT5.jpg",
+        desc: "Poo po përgatitet për t’u bërë udhëheqësi shpirtëror i Luginës së tij të Paqes, por gjithashtu ka nevojë për dikë që të zërë vendin e tij si Luftëtari i Dragoit.",
+        video: "https://voe.sx/e/5fdijm8oskb6"
+      },
+      {
+        title: "Home Alone",
+        genre: "Comedy",
+        image: "https://image.tmdb.org/t/p/w185/9wSbe4CwObACCQvaUVhWQyLR5Vz.jpg",
+        desc: "Dy familje të afërmsh me fëmijë të shumtë nisen për në Paris ku do të kalojnë festat e Krishtlindjeve. Në furinë dhe konfuzionin e minutave të fundit Kevin i vogël është “harruar” në shtëpi, i cilësuar si më i guximshmi nga të gjithë fëmijët. Nëna përpiqet më kot të kontaktojë me të ose të kthehet, por djali duhet të kujdeset vetë. E bën shumë mirë: me fishekzjarre, katran dhe djallëzi të tjera i bën të ikin dy hajdutë që kanë hyrë në shtëpi.",
+        video: "https://voe.sx/e/032ma18jpgwy"
+      },
+      {
+        title: "Home Alone 2: Lost in New York",
+        genre: "Comedy",
+        image: "https://image.tmdb.org/t/p/w185/uuitWHpJwxD1wruFl2nZHIb4UGN.jpg",
+        desc: "Një tjetër gabim në familjen McCallister: ndërsa prindërit e tij shkojnë në Majami për Krishtlindje, Kevini i vogël e gjen veten vetëm në Nju Jork. Por ai shkon shumë mirë: jeton si një nabob në hotelin Plaza, ndeshet me dy kriminelët e filmit të parë përsëri dhe përsëri i redukton në një fillim të keq, duke kursyer kështu të ardhurat e epokës së madhe të lodrave Duncan. Më pas ai miqësohet me “zonjën e pëllumbave” në Central Park",
+        video: "https://voe.sx/e/indb4xbigw8u"
+      },
+      {
+        title: "Miraculous: Ladybug & Cat Noir, The Movie",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/bBON9XO9Ek0DjRwMBnJNCwC96Cd.jpg",
+        desc: "Marinette dhe Adrien, dy adoleshentë në Paris, shndërrohen në superheronjtë Ladybug dhe Cat Noir për të shpëtuar qytetin nga një kërcënim i ri misterioz. Një aventurë plot aksion, magji dhe dashuri!",
+        video: "https://voe.sx/e/nqarprjqc9o6"
+      },
+      {
+        title: "Terrifier",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/6PQqC4SbY910VvyVad6mvsboILU.jpg",
+        desc: "Një vrasës i tmerrshëm i quajtur Art the Clown terrorizon dy gra në natën e Halloween-it. Një film horror i errët dhe i frikshëm.",
+        video: "https://voe.sx/e/4trzcgnb3yxx"
+      },
+      {
+        title: "Terrifier 2",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/yB8BMtvzHlMmRT1WmTQnGv1bcOK.jpg",
+        desc: "Art the Clown kthehet për të terrorizuar një adoleshente dhe vëllain e saj të vogël në natën e Halloween-it. Më shumë gjak, më shumë tmerr!",
+        video: "https://voe.sx/e/n1hgeorwnk20"
+      },
+      {
+        title: "Terrifier 3",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/63xYQj1BwRFielxsBDXvHIJyXVm.jpg",
+        desc: "Art the Clown rikthehet edhe një herë për të sjellë terror të paprecedentë në natën e Krishtlindjeve. Horror i pastër dhe i papërmbajtshëm.",
+        video: "https://voe.sx/e/rkcttrix8ks1"
+      },
+      {
+        title: "The Boss Baby",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/unPB1iyEeTBcKiLg8W083rlViFH.jpg",
+        desc: "Një foshnjë e pazakontë, i veshur me kostum dhe që flet si një i rritur, bashkohet me vëllain e tij të madh për të ndaluar një komplot të keq që ka të bëjë me foshnjat dhe qentë.",
+        video: "https://voe.sx/e/fpoq6srtx8nw"
+      },
+      {
+        title: "One Piece: Strong World",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/z9S39hH4IOX9Hmtn3zho3Wdqem8.jpg",
+        desc: "Luffy dhe ekuipazhi i tij përballen me një pirat legjendar që ka kapur Namin. Një aventurë e jashtëzakonshme plot aksion dhe humor!",
+        video: "https://voe.sx/e/acczrz6a8n8e"
+      },
+      {
+        title: "One Piece: Stampede",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/4E2lyUGLEr3yH4q6kJxPkQUhX7n.jpg",
+        desc: "Ekuipazhi i Straw Hat merr pjesë në Festivalin e Piratëve, ku përballen me kundërshtarë të rrezikshëm dhe një thesar legjendar.",
+        video: "https://voe.sx/e/i9h1cvvyllrw"
+      },
+      {
+        title: "Spider-Man",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/rweIrveL43TaxUN0akQEaAXL6x0.jpg",
+        desc: "Peter Parker fiton fuqi të jashtëzakonshme pas një pickimi nga një merimangë dhe përballet me Green Goblin në betejën e tij të parë si Spider-Man.",
+        video: "https://voe.sx/e/gwphaghbmd0a"
+      },
+      {
+        title: "Spider-Man 2",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/olxpyq9kJAZ2NU1siLshhhXEPR7.jpg",
+        desc: "Spider-Man përballet me Dr. Octopus, një shkencëtar i çmendur me tentakula mekanike, ndërsa lufton për të balancuar jetën e tij personale dhe heroike.",
+        video: "https://voe.sx/e/cxifitryok85"
+      },
+      {
+        title: "Spider-Man 3",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/sqZKCRYGovZ8aN99VVJSdL8Ja9k.jpg",
+        desc: "Peter Parker përballet me Venom, Sandman dhe Green Goblin, duke luftuar demonët e tij të brendshëm dhe armiqtë e jashtëm.",
+        video: "https://voe.sx/e/01aw21az0ddg"
+      },
+      {
+        title: "The Amazing Spider-Man",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/dQ8TOCYgP9pzQvSb1cmaalYqdb5.jpg",
+        desc: "Peter Parker zbulon të kaluarën e prindërve të tij dhe përballet me Lizard, një shkencëtar që shndërrohet në një përbindësh.",
+        video: "https://voe.sx/e/ndfgedis3egv"
+      },
+      {
+        title: "The Amazing Spider-Man 2",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/h4NC0pkqvDX7Q6TI3PyW4NJKEYi.jpg",
+        desc: "Spider-Man përballet me Electro dhe Green Goblin, duke u përpjekur të shpëtojë qytetin dhe të mbrojë të dashurit e tij.",
+        video: "https://voe.sx/e/r9qqe7oc6or8"
+      },
+      {
+        title: "Spider-Man: No Way Home",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
+        desc: "Spider-Man bashkohet me Spider-Man nga universet e tjera për të përballur armiqtë klasikë dhe për të shpëtuar botën nga kaosi multiversal.",
+        video: "https://voe.sx/e/yy3ipz82dnsr"
+      },
+      {
+        title: "Deep Cover",
+        genre: "Comedy",
+        image: "https://image.tmdb.org/t/p/w185/euM8fJvfH28xhjGy25LiygxfkWc.jpg",
+        desc: "Deep Cover është një komedi plot aksion dhe situata të papritura, ku një polic nën mbulim përfshihet në botën e krimit. Filmi sjell humor të zgjuar, karaktere të veçanta dhe një rrjedhë ngjarjesh që të mbajnë të mbërthyer nga fillimi deri në fund. Një zgjedhje e shkëlqyer për ata që duan të qeshin dhe të shijojnë një histori të pazakontë!",
+        video: "https://voe.sx/e/ec4lkxpqbcjc"
+      },
+      {
+        title: "Venom",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/2uNW4WbgBXL25BAbXGLnLqX71Sw.jpg",
+        desc: "Eddie Brock bëhet strehuesi i një simbioti alien, duke çliruar alter egon e tij, Venom, dhe duke u përballur me një armik vdekjeprurës.",
+        video: "https://voe.sx/e/oodt0fsqipqd"
+      },
+      {
+        title: "Venom: Let There Be Carnage",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/rjkmN1dniUHVYAtwuV3Tji7FsDO.jpg",
+        desc: "Venom përballet me një kërcënim të ri kur vrasësi serial Cletus Kasady bëhet mikpritësi i simbiotit Carnage.",
+        video: "https://voe.sx/e/lx8ie31h1j01"
+      },
+      {
+        title: "Venom: The Last Dance",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/k42Owka8v91trK1qMYwCQCNwJKr.jpg",
+        desc: "Eddie Brock dhe Venom përballen me sfidën e tyre më të madhe deri më tani në kapitullin e fundit të sagës Venom.",
+        video: "https://voe.sx/e/tjwwndbkrqws"
+      },
+      {
+        title: "Ice Age: Dawn of the Dinosaurs",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/cXOLaxcNjNAYmEx1trZxOTKhK3Q.jpg",
+        desc: "Manny, Sid, dhe Diego zbulojnë një botë të fshehtë të dinosaurëve, duke u përballur me aventura të reja dhe rreziqe të papritura.",
+        video: "https://voe.sx/e/xo79qt4e9uo5"
+      },
+      {
+        title: "Ice Age: A Mammoth Christmas",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/kwLi6MLlVsPWMVB9gOpFo5n7HZR.jpg",
+        desc: "Sid futet në listën e zezë të Santa Claus dhe grupi niset në Polin e Veriut për të shpëtuar Krishtlindjet.",
+        video: "https://voe.sx/e/f9pbc5fqifsw"
+      },
+      {
+        title: "Ice Age: Collision Course",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/1VCRVaBObV3ZLDuuYQHCs87NBmi.jpg",
+        desc: "Scrat nis një aventurë kozmike që kërcënon botën, ndërsa Manny dhe miqtë e tij përpiqen të shpëtojnë tufën nga katastrofa.",
+        video: "https://voe.sx/e/pjt1jsxuvtig"
+      },
+      {
+        title: "The Dictator",
+        genre: "Comedy",
+        image: "https://image.tmdb.org/t/p/w185/n0W7kajF4GFMRk2c0wWwMQqTaDM.jpg",
+        desc: "Gjeneral Aladeen (Sacha Baron Cohen), diktator i shtetit të Wadiya, i shtypur nga sundimi shumëvjeçar autoritar, shkon në Shtetet e Bashkuara për të marrë pjesë në një kongres të OKB -së.",
+        video: "https://voe.sx/e/ovto9huweo9c"
+      },
+      {
+        title: "Shrek",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/iB64vpL3dIObOtMZgX3RqdVdQDc.jpg",
+        desc: "Shrek, një ork i vogël me një zemër ari, së bashku me Gomarin e tij përpiqet të rimarrë në zotërim kënetën e tij të zënë nga personazhet e përrallave. Ata janë burgosur nga Zoti i keq Farquaad, tiran i tokës së Duloc. Orku dhe gomari i pandarë duhet të punojnë për të liruar një princeshë që i është nënshtruar një magjie dhe është mbajtur rob në një kështjellë, të ruajtur nga një dragua.",
+        video: "https://voe.sx/e/sh44y3ddq73c"
+      },
+      {
+        title: "Shrek 2",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/wr5OLKkNS6Ztb7xZRKgWpVr9AkA.jpg",
+        desc: "Duke u kthyer nga dasma e tyre, Shrek dhe Fiona janë të ftuar nga prindërit e saj, Mbreti Harold dhe Mbretëresha Lilian. Por nuk e dinë që të dy janë orkë të gjelbër. Për të kompensuar krimin, sovranët, të cilët kishin bërë plane të tjera për martesën e vajzës së tyre, thërrasin Nunën e Zanës, Maçokun me Çizme dhe Princin e bukur Charming.",
+        video: "https://voe.sx/e/gr6anfcl9by9"
+      },
+      {
+        title: "Shrek the Halls",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/xejoSLtxLNkglY5YkojlOkMHz3u.jpg",
+        desc: "Pema e Krishtlindjes nuk është e vetmja gjë e gjelbër në këtë klasik të ri festash. Shrek është rikthyer dhe po përpiqet të futet në frymën e sezonit. Pasi i premtoi Fionës dhe fëmijëve një Krishtlindje që do ta kujtojnë gjatë, ai detyrohet të marrë një kurs përplasjeje gjatë festës. Por pikërisht kur ai mendon se ka gjithçka për Krishtlindjet e tyre të qeta familjare, troket dera…",
+        video: "https://voe.sx/e/qlaziyjia2qg"
+      },
+      {
+        title: "Shrek Forever After",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/6HrfPZtKcGmX2tUWW3cnciZTaSD.jpg",
+        desc: "Aventurat e episodeve të mëparshme tani janë një kujtim i largët dhe Shrek është bërë një njeri i vërtetë i familjes. Sidoqoftë, jeta aventureske “si ork” vazhdon të ushtrojë një bukuri të caktë mbi të dhe nostalgjia për ditët e mira të vjetra është e fortë. Shrek kështu mashtrohet nga xhuxhi Rumple. Ai do të përfundojë papritur duke e gjetur veten në një tjetër “Larg shumë Larg”: një lloj universi paralel, ku orkët gjuhen dhe Rumple është mbret. Orku i gjelbër do të duhet të punojë shumë për të rikthyer gjithçka në normale dhe për të shpëtuar botën e tij dhe këdo që do.",
+        video: "https://voe.sx/e/nasfyesnvgdn"
+      },
+      {
+        title: "Frozen",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/kgwjIb2JDHRhNk13lmSxiClFjVk.jpg",
+        desc: "Princesha e re Anna of Arendelle ëndërron të gjejë dashurinë e vërtetë në kurorëzimin e motrës së saj Elsa. Fati e çon atë në një udhëtim të rrezikshëm në një përpjekje për t’i dhënë fund dimrit të përjetshëm që ka rënë mbi mbretërinë. Ajo shoqërohet nga dërguesi i akullit Kristoff, renë e tij Sven dhe burrë dëbore Olaf. Në një aventurë ku ajo do të zbulojë se çfarë do të thotë në të vërtetë miqësia, guximi, familja dhe dashuria e vërtetë.",
+        video: "https://voe.sx/e/1v97llu0qwxd"
+      },
+      {
+        title: "Frozen II",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/mINJaa34MtknCYl5AjtNJzWj8cD.jpg",
+        desc: "Princesha e re Anna of Arendelle ëndërron të gjejë dashurinë e vërtetë në kurorëzimin e motrës së saj Elsa. Fati e çon atë në një udhëtim të rrezikshëm në një përpjekje për t’i dhënë fund dimrit të përjetshëm që ka rënë mbi mbretërinë. Ajo shoqërohet nga dërguesi i akullit Kristoff, renë e tij Sven dhe burrë dëbore Olaf. Në një aventurë ku ajo do të zbulojë se çfarë do të thotë në të vërtetë miqësia, guximi, familja dhe dashuria e vërtetë.",
+        video: "https://voe.sx/e/5jb22bk0vven"
+      },
+      {
+        title: "Moana",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/9tzN8sPbyod2dsa0lwuvrwBDWra.jpg",
+        desc: "Në Polinezinë e Lashtë, kur një mallkim i tmerrshëm i shkaktuar nga Maui arrin në ishullin e vajzës së një prijësi të vrullshëm, ajo i përgjigjet thirrjes së Oqeanit për të kërkuar gjysmëperëndinë për t’i rregulluar gjërat.",
+        video: "https://voe.sx/e/mmwgugkxys6e"
+      },
+      {
+        title: "Moana 2",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/m0SbwFNCa9epW1X60deLqTHiP7x.jpg",
+        desc: "Pas marrjes së një telefonate të papritur nga paraardhësit e saj gjetës, Moana udhëton së bashku me Maui-n dhe një ekuipazh të ri në detet e largëta të Oqeanisë dhe në ujërat e rrezikshme e të humbur prej kohësh për një aventurë ndryshe nga çdo gjë me të cilën është përballur ndonjëherë.",
+        video: "https://voe.sx/e/ohmfslw97an7"
+      },
+      {
+        title: "Annabelle",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/a9iL3FIwLrympRyiL5v0tAkwrvX.jpg",
+        desc: "Një çift fillon të përjetojë dukuri të tmerrshme të mbinatyrshme që përfshijnë një kukull të cilësisë së mirë pak pasi shtëpia e tyre pushtohet nga kulturistët satanikë.",
+        video: "https://voe.sx/e/iz6ocztdvuvw"
+      },
+      {
+        title: "The Nun",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/sFC1ElvoKGdHJIWRpNB3xWJ9lJA.jpg",
+        desc: "Një murgeshë e re vret veten në një abati në Rumani. Nga Vatikani për të ndriçuar ngjarjen, një prift me një të kaluar të stuhishme dhe një rishtar i ri dërgohen në pragun e betimeve. Së bashku ata do të zbulojnë sekretin profan të rendit, duke rrezikuar jo vetëm jetën e tyre, por edhe besimin dhe shpirtin e tyre.",
+        video: "https://voe.sx/e/qb0avkzlmzia"
+      },
+      {
+        title: "The Nun II",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/5gzzkR7y3hnY8AD1wXjCnVlHba5.jpg",
+        desc: "Në vitin 1956 në Francë, një prift vritet me dhunë dhe motra Irene fillon të hetojë. Ajo vjen edhe një herë ballë për ballë me një të keqe të fuqishme.",
+        video: "https://voe.sx/e/ltrkzug20uep"
+      },
+      {
+        title: "Mr. Bean’s Holiday",
+        genre: "Comedy",
+        image: "https://image.tmdb.org/t/p/w185/bSSx9Sq6irWwN9NTQmoT9KE8kXn.jpg",
+        desc: "Z. Bean fiton një udhëtim në Kanë, ku padashur ndan një djalë të ri nga babai i tij dhe duhet t’i ndihmojë të dy të ribashkohen. Rrugës ai zbulon Francën, biçikletën dhe dashurinë e vërtetë, ndër të tjera.",
+        video: "https://voe.sx/e/uaciuxbnub8c"
+      },
+      {
+        title: "Titanic",
+        genre: "Drama",
+        image: "https://image.tmdb.org/t/p/w185/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg",
+        desc: "101-vjeçarja Rose DeWitt Bukater tregon historinë e jetës së saj në bordin e Titanikut, 84 vjet më vonë. Një Rose e re hipi në anije me nënën dhe të fejuarin e saj. Ndërkohë, Jack Dawson dhe Fabrizio De Rossi fitojnë bileta të klasit të tretë në bordin e anijes. Rose tregon të gjithë historinë nga nisja e Titanikut deri në vdekjen e tij – në udhëtimin e tij të parë dhe të fundit – më 15 prill 1912.",
+        video: "https://voe.sx/e/eeptkpmfjoh5"
+      },
+      {
+        title: "Hereditary",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/4GFPuL14eXi66V96xBWY73Y9PfR.jpg",
+        desc: "Kur Ellen, matriarku i familjes Graham, vdes, familja e vajzës së saj fillon të zbulojë sekrete të fshehta dhe gjithnjë e më të frikshme për prejardhjen e tyre.",
+        video: "https://voe.sx/e/grns20tizz8x"
+      },
+      {
+        title: "Coco",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/gGEsBPAijhVUFoiNpgZXqRVWJt2.jpg",
+        desc: "Pavarësisht ndalimit befasues të muzikës prej brezash të familjes së tij, Miguel ëndërron të bëhet një muzikant i arrirë si idhulli i tij, Ernesto de la Cruz. I dëshpëruar për të provuar talentin e tij, Miguel e gjen veten në Tokën mahnitëse dhe shumëngjyrëshe të të Vdekurve pas një zinxhiri misterioz ngjarjesh. Gjatë rrugës, ai takon mashtruesin simpatik Hector, dhe së bashku, ata nisen në një udhëtim të jashtëzakonshëm për të zhbllokuar historinë e vërtetë pas historisë së familjes së Miguelit.",
+        video: "https://voe.sx/e/k0fvmlonj4rn"
+      },
+      {
+        title: "A Beautiful Mind",
+        genre: "Drama",
+        image: "https://image.tmdb.org/t/p/w185/zwzWCmH72OSC9NA0ipoqw5Zjya8.jpg",
+        desc: "Në 1948 John Forbes Nash jr. është në Princeton me bursat më të lakmuara; por ai nuk është i racës klasike të studentëve që për breza të tërë kanë pasur universitetin në gjak dhe në mënyrën e tyre. Borgjez i vogël, pak përtac, kokën në re, shumë gromësirë, aspak i mësuar me ritet e rinisë, matematicieni që do të shënohet nga skizofrenia shtjellon teorinë e tij ekonomike të lojërave. Sipas tij, luhatjet në tregjet financiare mund të llogariten shumë saktësisht. Idetë e tij nuk kaluan pa u vënë re dhe një përfaqësues i Departamentit të Mbrojtjes vjen tek ai për t’i ofruar atij bashkëpunim. Por jeta e tij do të shënohet edhe nga sëmundje mendore.",
+        video: "https://voe.sx/e/vm1gbfgasvzn"
+      },
+      {
+        title: "Forrest Gump",
+        genre: "Drama",
+        image: "https://image.tmdb.org/t/p/w185/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg",
+        desc: "Një burrë me një IQ të ulët ka arritur gjëra të mëdha në jetën e tij dhe ka qenë i pranishëm gjatë ngjarjeve të rëndësishme historike – në secilin rast, shumë më tepër se çfarë dikush imagjinonte se mund të bënte. Por pavarësisht gjithçkaje që ka arritur, dashuria e tij e vetme e vërtetë i shmanget atij.",
+        video: "https://voe.sx/e/ztv8s7sflbn5"
+      },
+      {
+        title: "The Shawshank Redemption",
+        genre: "Drama",
+        image: "https://image.tmdb.org/t/p/w185/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+        desc: "Jemi në vitin 1946. Proçesuar për vrasjen e gruas së tij dhe të dashurit e saj, Andy, një bankier nga New England, është dënuar me një dënim të dyfishtë të përjetshëm dhe i burgosur në burgun Shawshank. Në fillim ai ishte viktimë e dhunës së të burgosurve, por më pas ai u bë këshilltari financiar i rojeve.",
+        video: "https://voe.sx/e/3rk5o8zijw8f"
+      },
+      {
+        title: "Sinister",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/nzx10sca3arCeYBAomHan4Q6wa1.jpg",
+        desc: "Shkrimtari i krimeve të vërteta, Ellison Oswald është në një rënie; ai nuk ka pasur një best seller për më shumë se 10 vjet dhe po bëhet gjithnjë e më i dëshpëruar për një hit. Kështu, kur ai zbulon ekzistencën e një filmi me nuhatje që tregon vdekjen e një familjeje, ai zotohet të zgjidhë misterin. Ai zhvendos familjen e tij në shtëpinë e viktimave dhe shkon në punë. Megjithatë, kur pamjet e vjetra filmike dhe të dhëna të tjera lënë të kuptohet për praninë e një force të mbinatyrshme, Ellison mëson se të jetuarit në shtëpi mund të jetë fatale.",
+        video: "https://voe.sx/e/jciwbt45yze1"
+      },
+      {
+        title: "Sinister 2",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/jaUsNmDx3PU6jOEKKu4r2NkdHsI.jpg",
+        desc: "Një nënë e re dhe djemtë e saj binjakë zhvendosen në një shtëpi rurale që është shënuar për vdekje.",
+        video: "https://voe.sx/e/0moawpil9cig"
+      },
+      {
+        title: "Until Dawn",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/juA4IWO52Fecx8lhAsxmDgy3M3.jpg",
+        desc: "Një vit pasi motra e saj Melanie u zhduk në mënyrë misterioze, Clover dhe miqtë e saj shkojnë në luginën e largët ku ajo u zhduk në kërkim të përgjigjeve. Duke eksploruar një qendër të braktisur vizitorësh, ata e gjejnë veten të përndjekur nga një vrasës i maskuar dhe të vrarë tmerrësisht një nga një … vetëm për t’u zgjuar dhe për ta gjetur veten në fillim të së njëjtës mbrëmje.",
+        video: "https://voe.sx/e/c0080xlf27rs"
+      },
+      {
+        title: "Encanto",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/4j0PNHkMr5ax3IA8tjtxcmPU3QT.jpg",
+        desc: "Maribel, një vajzë kolumbiane, duhet të përballet me zhgënjimin që vjen nga të qenit e vetmja anëtare e familjes së saj që nuk ka fuqi magjike. Por kur bota e saj është në rrezik, ajo do të kuptojë se cili është në të vërtetë roli i saj.",
+        video: "https://voe.sx/e/s4rxwcw1msxx"
+      },
+      {
+        title: "Inside Out",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/2H1TmgdfNtsKlU9jKdeNyYL5y8T.jpg",
+        desc: "Të rritesh nuk është gjithmonë e lehtë, dhe 11-vjeçarja Riley e kupton atë kur ajo detyrohet të lërë jetën në Midwest për të ndjekur punën e babait të saj në San Francisko. Ashtu si të gjithë, Riley nxitet nga pesë emocionet kryesore – Gëzimi, Frika, Zemërimi, neveria dhe Trishtimi – që jetojnë në mendjen e saj dhe e ndihmojnë atë të përballojë jetën e përditshme. Ndërsa Riley përpiqet të përshtatet me qytetin e ri të madh, agjitacioni rritet në selinë e emocioneve: megjithëse Gëzimi përpiqet të mbajë një pikëpamje pozitive për gjërat, emocionet e mbetura bien ndesh me mënyrën e mirë për të eksploruar realitetin e ri në të cilin ata gjenden.",
+        video: "https://voe.sx/e/n7getcb1oca9"
+      },
+      {
+        title: "Inside Out 2",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg",
+        desc: "Selia e mendjes së adoleshentit Riley po i nënshtrohet një prishjeje të papritur për t’i lënë vend diçkaje krejtësisht të papritur: Emocione të reja! Gëzimi, trishtimi, zemërimi, frika dhe neveria, të cilët prej kohësh kanë kryer një operacion të suksesshëm sipas të gjitha llogarive, nuk janë të sigurt se si të ndihen kur shfaqet Ankthi. Dhe duket se ajo nuk është vetëm.",
+        video: "https://voe.sx/e/qkezp6mxr4y9"
+      },
+      {
+        title: "The Exorcism",
+        genre: "Horror",
+        image: "https://image.tmdb.org/t/p/w185/ar2h87jlTfMlrDZefR3VFz1SfgH.jpg",
+        desc: "Një aktor i trazuar fillon të zbulohet gjatë xhirimit të një filmi horror mbinatyror, duke e bërë vajzën e tij të larguar të pyesë nëse ai po rrëshqet sërish në varësitë e tij të së kaluarës apo nëse ka diçka më të keqe në lojë.",
+        video: "https://voe.sx/e/4lq3wmxql2ct"
+      },
+      {
+        title: "The Mask",
+        genre: "Comedy",
+        image: "https://image.tmdb.org/t/p/w185/xbbXp9px4o8Oe7IbGd0yIbla8mZ.jpg",
+        desc: "Kur nëpunësi i ndrojtur i bankës Stanley Ipkiss zbulon një maskë magjike që përmban shpirtin e perëndisë norvegjeze Loki, e gjithë jeta e tij ndryshon. Ndërsa mban maskën, Ipkiss bëhet një playboy i mbinatyrshëm që nxjerr sharm dhe besim, gjë që e lejon atë të tërheqë vëmendjen e këngëtares lokale të klubeve të natës, Tina Carlyle. Për fat të keq, nën ndikimin e maskës, Ipkiss grabit edhe një bankë, gjë që zemëron zotin e vogël të krimit, Dorian Tyrell, gocat e të cilit fajësohen për grabitjen.",
+        video: "https://voe.sx/e/aeefldjxc6wq"
+      },
+      {
+        title: "Night at the Museum",
+        genre: "Comedy",
+        image: "https://image.tmdb.org/t/p/w185/uY9k8t2FQkMj60obnAnsPKLxHCE.jpg",
+        desc: "Larry Daley, një roje nate në Muzeun e Historisë Natyrore të Nju Jorkut, po bën turneun e tij të zbulimit kur kafshët e mbushura dhe statujat e personazheve të vendosur në dhoma të ndryshme fillojnë të marrin jetë: Teddy Roosevelt, Christopher Columbus, Attila – gjithashtu si dinosaurët dhe kafshët e tjera të zhdukura – ata do t’i japin atij shumë telashe.",
+        video: "https://voe.sx/e/wsmkni5yfudl"
+      },
+      {
+        title: "Central Intelligence",
+        genre: "Comedy",
+        image: "https://image.tmdb.org/t/p/w185/7irCMBIivXAqjZ7MgZoGVLrgACR.jpg",
+        desc: "Pasi ribashkohet me një mik të vjetër përmes Facebook-ut, një kontabilist me sjellje të butë joshet në botën e spiunazhit ndërkombëtar.",
+        video: "https://voe.sx/e/banmp2yqvvvs"
+      },
+      {
+        title: "Cars 3",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/fyy1nDC8wm553FCiBDojkJmKLCs.jpg",
+        desc: "I verbuar nga një gjeneratë e re vrapuesish të shpejtë, legjendar Lightning McQueen largohet papritur nga sporti që ai pëlqen. Për t’u rikthyer në lojë, atij do t’i duhet ndihma e një teknike të re të etur garash me planin e saj për të fituar, frymëzim nga i ndjeri Fabulous Hudson Hornet dhe disa kthesa të papritura. Vërtetimi se numri 95 nuk ka përfunduar ende do të testojë zemrën e një kampioni në skenën më të madhe të Piston Cup Racing!",
+        video: "https://voe.sx/e/ts2wc98f3rwl"
+      },
+      {
+        title: "The Prince of Egypt",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/2xUjYwL6Ol7TLJPPKs7sYW5PWLX.jpg",
+        desc: "Moisiu hebre, duke u larguar nga tërbimi i ujërave të Nilit, është marrë dhe adoptuar nga faraoni. I rritur si një princ brenda pallatit, djali bëhet miku i pandashëm i Ramses, trashëgimtari i fronit. Por Moisiu zbulon origjinën e tij dhe detyrohet të ballafaqohet me mikun e tij të dikurshëm. Lufta do të bëhet e përgjakshme kur Moisiu zgjidhet nga Zoti për të çliruar popullin Hebre nga skllavëria e Egjiptit.",
+        video: "https://voe.sx/e/57im8oe6m9od"
+      },
+      {
+        title: "Finding Nemo",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/eHuGQ10FUzK1mdOY69wF5pGgEf5.jpg",
+        desc: "Nemo, një peshk i ri klloun aventurier, është çuar papritur nga shtëpia e tij e Madhe Barrier Reef në akuariumin e zyrës së një dentisti. I takon babait të tij shqetësues Marlin dhe një peshku miqësor, por harrues, Dory, që ta sjellin Nemon në shtëpi – duke takuar peshkaqenë vegjetarianë, breshka të sërfit, kandil deti hipnotik, pulëbardha të uritura dhe më shumë gjatë rrugës.",
+        video: "https://voe.sx/e/mngwzkkjqk5l"
+      },
+      {
+        title: "Tangled",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/ym7Kst6a4uodryxqbGOxmewF235.jpg",
+        desc: "Kur banditi më i kërkuar dhe më simpatik i mbretërisë Flynn Rider fshihet në një kullë misterioze, ai merret peng nga Rapunzel, një adoleshent i bukur dhe i guximshëm i lidhur në kullë me 70 këmbë flokë magjike, të arta. Rrëmbyesja kurioze e Flynn-it, e cila po kërkon biletën e saj për të dalë nga kulla ku ka qenë e mbyllur për vite me rradhë, lidh një marrëveshje me hajdutin e pashëm dhe dyshja e vështirë niset në një arratisje të mbushur me aksione, të kompletuar me një kalë super-polic, një Kameleon tepër mbrojtës dhe një bandë e ashpër banditësh.",
+        video: "https://voe.sx/e/svcjwr9mtpie"
+      },
+      {
+        title: "The Lion King",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/sKCr78MXSLixwmZ8DyJLrpMsd15.jpg",
+        desc: "Një princ luani i ri dëbohet nga krenaria e tij nga xhaxhai i tij mizor, i cili pretendon se vrau babanë e tij. Ndërsa xhaxhai sundon me një puthje hekuri, princi rritet përtej Savanës, duke jetuar sipas një filozofie: Mos u shqetësoni për pjesën tjetër të ditëve tuaja. Por kur e kaluara e tij ta ndjekë, princi i ri duhet të vendosë për fatin e tij: A do të mbetet ai një i dëbuar apo do të përballet me demonët e tij dhe do të bëhet ai që duhet të jetë?",
+        video: "https://voe.sx/e/coxrjxfpdgju"
+      },
+      {
+        title: "The Lion King II: Simba’s Pride",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/sWR1x6UCMCGN9xEf8RGhPS934X0.jpg",
+        desc: "Rrethi i jetës vazhdon për Simbën, tashmë plotësisht i rritur dhe në vendin e tij të merituar si mbreti i Pride Rock. Simba dhe Nala kanë sjellë në jetë një vajzë, Kiara, e cila është po aq rebele sa babai i saj. Por Kiara i shpërqendron prindërit e saj kur i bie në sy Kovu, djali i luaneshës së keqe, Zira. A do t’ia vjedhë Kovu zemrën Kiarës?",
+        video: "https://voe.sx/e/fvfspgk4nekq"
+      },
+      {
+        title: "Elemental",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/8riWcADI1ekEiBguVB9vkilhiQm.jpg",
+        desc: "Në një qytet ku banorët e zjarrit, ujit, tokës dhe ajrit jetojnë së bashku, një e re e zjarrtë dhe një djalë i shkathët do të zbulojnë diçka thelbësore: sa shumë të përbashkëta kanë.",
+        video: "https://voe.sx/e/pzp0tenvwep2"
+      },
+      {
+        title: "Soul",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/hm58Jw4Lw8OIeECIq5qyPYhAeRJ.jpg",
+        desc: "Joe Gardner është një mësues i shkollës së mesme me një dashuri për muzikën xhaz. Pas një koncerti të suksesshëm në Half Note Club, ai papritmas pëson një aksident që ndan shpirtin e tij nga trupi i tij dhe transportohet në Seminarin You, një qendër në të cilën shpirtrat zhvillohen dhe fitojnë pasione para se të transportohen tek një fëmijë i porsalindur. Joe duhet të kërkojë ndihmë nga shpirtrat e tjerë stërvitorë, si 22, një shpirt që ka kaluar vite në Seminarin You, në mënyrë që të kthehet në Tokë.",
+        video: "https://voe.sx/e/itxmynarvz84"
+      },
+      {
+        title: "Luca",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/7rhzEufovmmUqVjcbzMHTBQ2SCG.jpg",
+        desc: "Luca është një fëmijë i ndrojtur, i arsimuar, introvert dhe që respekton rregullat, i cili ka një dëshirë të fshehtë për të parë botën dhe për të mësuar gjithçka që mundet për të. Por, gjatë gjithë jetës së tij, atij i është thënë që përbindëshat e detit nuk duhet të dalin kurrë në sipërfaqe dhe të dalin nga uji, ku duket se po ndodhin të gjitha gjërat më të lezetshme. Prandaj nuk është për t’u habitur që Luca është magjepsur fshehurazi nga të gjitha gjërat që kanë të bëjnë me njerëzit. Kurioziteti i tij ndizet veçanërisht kur zbulon objekte që janë zhytur në det nga sipërfaqja. Luca nuk di asgjë për botën në sipërfaqe. Pra, këto objekte janë pamje të vogla të një bote tjetër, sikur të ishin objekte që vinin nga ulja e një jashtëtokësori në Tokë. Ai është një fëmijë plot imagjinatë, kështu që kur takon Alberton, i cili i njeh vërtet këto objekte, Luca ndihet vërtet i magjepsur.",
+        video: "https://voe.sx/e/ivekccl65kh4"
+      },
+      {
+        title: "WALL-E",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/iujbETnK8hvNcgkNwzS7Nv4Thqc.jpg",
+        desc: "Në një të ardhme të largët, por jo aq jorealiste, ku njerëzimi e ka braktisur Tokën sepse është mbuluar me mbeturina nga produktet e shitura nga korporata e fuqishme shumëkombëshe Buy N Large, WALL-E, një robot mbledhës mbeturinash është lënë të pastrojë rrëmujën. I magjepsur nga xhingla të historisë së Tokës dhe meloditë e shfaqjeve, WALL-E është vetëm në Tokë përveç një buburreci të gjallë.",
+        video: "https://voe.sx/e/q5nshfirutlk"
+      },
+      {
+        title: "Corpse Bride",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/isb2Qow76GpqYmsSyfdMfsYAjts.jpg",
+        desc: "Victor është gati të martohet me të dashurën e tij Viktoria, kur, rrugës për t’u bashkuar me të, ai ndalon në një pyll për të pushuar. Një degëz del nga toka dhe, si shaka, Viktori rrëshqet unazën e martesës në të. Degëza zbulohet se është gishti i një vajze të vrarë shumë kohë përpara se ajo të kthehet në jetë dhe të deklarojë se është zyrtarisht e martuar me Viktorin.",
+        video: "https://voe.sx/e/o992dtyziwbk"
+      },
+      {
+        title: "The Wild Robot",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/9w0Vh9eizfBXrcomiaFWTIPdboo.jpg",
+        desc: "Pas një mbytjeje anijeje, një robot inteligjent i quajtur Roz është bllokuar në një ishull të pabanuar. Për t’i mbijetuar mjedisit të ashpër, Roz lidhet me kafshët e ishullit dhe kujdeset për një patë jetime.",
+        video: "https://voe.sx/e/z4dref7yj1dw"
+      },
+      {
+        title: "Hitler: The Rise of Evil",
+        genre: "Drama",
+        image: "https://image.tmdb.org/t/p/w185/pyNC5JXNGNYZiu5b5UP9qEGvKGo.jpg",
+        desc: "Një tatëpjetë unike, që profilizon jetën e Adolf Hitlerit si fëmijë dhe ngritjen e tij në radhët e Partisë Kombëtare Socialiste të Punëtorëve Gjermanë para Luftës së Dytë Botërore.",
+        video: "https://voe.sx/e/x20877vze5dq"
+      },
+      {
+        title: "Hotel Transylvania: Transformania",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/teCy1egGQa0y8ULJvlrDHQKnxBL.jpg",
+        desc: "Kur shpikja misterioze e Van Helsingut, “Rrezja e përbindëshit”, bëhet e turbullt, Drakula dhe shokët e tij përbindësh shndërrohen të gjithë në njerëz, dhe Johnny bëhet një përbindësh. Në trupat e tyre të rinj të mospërputhur, ata garojnë anembanë globit për të gjetur një kurë para se të jetë tepër vonë.",
+        video: "https://voe.sx/e/s0l43kukeryd"
+      },
+      {
+        title: "Hotel Transylvania 3: Summer Vacation",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/gjAFM4xhA5vyLxxKMz38ujlUfDL.jpg",
+        desc: "Dracula, Mavis, Johnny dhe pjesa tjetër e Drac Pack bëjnë pushime në një anije luksoze lundrimi Monster, ku Drakula bie në dashuri me kapitenin e anijes, Ericka, i cili është fshehurazi një pasardhës i Abraham Van Helsing, vrasës famëkeq përbindësh.",
+        video: "https://voe.sx/e/28wb6440ulab"
+      },
+      {
+        title: "Luck",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/1HOYvwGFioUFL58UVvDRG6beEDm.jpg",
+        desc: "E gjetur papritur në Tokën e Fatit të paparë më parë, personi më i pafat në botë duhet të bashkohet me krijesat magjike atje për ta kthyer fatin e saj.",
+        video: "https://voe.sx/e/vct8kwocw7r2"
+      },
+      {
+        title: "The Godfather",
+        genre: "Drama",
+        image: "https://image.tmdb.org/t/p/w185/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
+        desc: "Filmi përfshin vitet 1945 deri në 1955, një kronikë e familjes së trilluar të krimit italo-amerikan Corleone. Kur patriarku i familjes së krimit të organizuar, Vito Corleone mezi i mbijeton një tentative për jetën e tij, djali i tij më i vogël, Michael ndërhyn për t’u kujdesur për vrasësit e mundshëm, duke nisur një fushatë hakmarrjeje të përgjakshme.",
+        video: "https://voe.sx/e/e5mnx6jucwdq"
+      },
+      {
+        title: "The Channel",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/9Z7TzgY3qcBX7VHaNG3E3t8YP1v.jpg",
+        desc: "Pasi grabitja e tyre e bankës shkon keq, një kriminel i dëshpëruar, vëllai i tij jashtë kontrollit dhe ekuipazhi i tyre i larmishëm i ish-marinsave duhet të shpëtojnë nga New Orleans dhe agjenti i vendosur i FBI-së që i ndjek.",
+        video: "https://voe.sx/e/ocyxyu7bszwl"
+      },
+      {
+        title: "Back in Action",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/mLxIlIf2Gopht23v5VFNpQZ2Rue.jpg",
+        desc: "Pesëmbëdhjetë vjet pasi u zhdukën nga CIA për të krijuar një familje, spiunët elitë Matt dhe Emily hidhen përsëri në botën e spiunazhit kur kopertina e tyre shpërthehet.",
+        video: "https://voe.sx/e/3q8c7vaj3egx"
+      },
+      {
+        title: "The Maze Runner",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/ode14q7WtDugFDp78fo9lCsmay9.jpg",
+        desc: "I vendosur në një botë post-apokaliptike, Thomas i ri depozitohet në një komunitet djemsh pasi kujtesa e tij fshihet, së shpejti mëson se të gjithë janë të bllokuar në një labirint që do t’i kërkojë atij të bashkojë forcat me shokët e tij “vrapues” për një goditje për t’u arratisur. .",
+        video: "https://voe.sx/e/ja9cab3asdka"
+      },
+      {
+        title: "Extraction",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/wlfDxbGEsW58vGhFljKkcR5IxDj.jpg",
+        desc: "Mercenari i tregut të zi Tyler Rake (Chris Hemsworth) nuk ka asgjë për të humbur kur punësohet për të shpëtuar djalin e rrëmbyer të një shefi të krimit ndërkombëtar. Por në botën e turbullt të trafikantëve të armëve dhe drogës, misioni, i cili nga jashtëzakonisht i rrezikshëm në pothuajse i pamundur, do të ndryshojë përgjithmonë Rake dhe jetën e djalit.",
+        video: "https://voe.sx/e/otgrcn1ue87q"
+      },
+      {
+        title: "Shark Tale",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/r08DpyPyhXcJTfNZAICNGMzcQ8l.jpg",
+        desc: "Oscar është një peshk i vogël, aspiratat e mëdha të të cilit shpesh e futin në telashe. Ndërkohë, Lenny është një peshkaqen i bardhë i madh me një sekret befasues që asnjë krijesë detare nuk do ta merrte me mend: Ai është vegjetarian. Kur një gënjeshtër e kthen Oscarin në një hero të pamundur dhe Lenny bëhet një i dëbuar, të dy krijojnë një miqësi të pamundur.",
+        video: "https://voe.sx/e/qnncvu5jtstm"
+      },
+      {
+        title: "Megamind",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/uZ9ytt3sPTx62XTfN56ILSuYWRe.jpg",
+        desc: "Superheroi Megamind më në fund mposht armikun e tij, superheroin Metro Man. Por pa një hero, ai humbet çdo qëllim dhe duhet të gjejë kuptim të ri në jetën e tij.",
+        video: "https://voe.sx/e/bxqzddnoxlsf"
+      },
+      {
+        title: "Antz",
+        genre: "Animation",
+        image: "https://image.tmdb.org/t/p/w185/lWPjxbUMpAHFkJpZHHNWhQaRsax.jpg",
+        desc: "Një milingonë punëtore neurotike e dashuruar me një princeshë rebele ngrihet në një famë të papritur kur ndërron vendet me një ushtar. I regjistruar për të marshuar në një paradë, ai përfundon nën komandën e një gjenerali të etur për gjak. Por në të vërtetë ai është rekrutuar për të luftuar kundër një ushtrie termitesh.",
+        video: "https://voe.sx/e/plibcg40n0jf"
+      },
+      {
+        title: "Scarface",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/iQ5ztdjvteGeboxtmRdXEChJOHh.jpg",
+        desc: "Pasi merr një karton jeshil në këmbim të vrasjes së një zyrtari të qeverisë kubane, Tony Montana ka një një pretendim për tregtinë e drogës në Miami. Duke vrarë me egërsi këdo që i qëndron në rrugën e tij, Toni përfundimisht bëhet bosi më i madh i drogës në shtet, duke kontrolluar pothuajse të gjithë kokainën që vjen përmes Majamit. Por presioni i shtuar nga policia, luftërat me kartelet kolumbiane të drogës dhe paranoja e tij e nxitur nga droga shërbejnë për të ndezur flakët e rënies së tij përfundimtare.",
+        video: "https://voe.sx/e/p2v3asoaitxg"
+      },
+      {
+        title: "Lord of War",
+        genre: "Drama",
+        image: "https://image.tmdb.org/t/p/w185/3MGQD4yXokufNlW1AyRXdiy7ytP.jpg",
+        desc: "Yuri Orlov është një tregtar armësh në botë dhe, përmes disa prej zonave më vdekjeprurëse të luftës, ai përpiqet të qëndrojë një hap përpara një agjenti të pamëshirshëm të Interpolit, rivalët e tij të biznesit dhe madje edhe disa nga klientët e tij, të cilët përfshijnë shumë nga diktatorët më famëkeq të botës. Së fundi, ai duhet të përballet edhe me ndërgjegjen e tij.",
+        video: "https://voe.sx/e/s92nb29pph8z"
+      },
+      {
+        title: "Jurassic World Rebirth",
+        genre: "Action",
+        image: "https://image.tmdb.org/t/p/w185/1RICxzeoNCAO5NpcRMIgg1XT6fm.jpg",
+        desc: "Pesë vjet pas ngjarjeve të Jurassic World Dominion, ekspertja e operacioneve të fshehta Zora Bennett është kontraktuar për të udhëhequr një ekip të aftë në një mision tepër sekret për të siguruar material gjenetik nga tre dinosaurët më masivë në botë. Kur operacioni i Zorës kryqëzohet me një familje civile, ekspedita e së cilës me varkë u përmbys, të gjithë e gjejnë veten të bllokuar në një ishull ku përballen me një zbulim të kobshëm dhe tronditës që është fshehur nga bota për dekada të tëra.uri Orlov është një tregtar armësh në botë dhe, përmes disa prej zonave më vdekjeprurëse të luftës, ai përpiqet të qëndrojë një hap përpara një agjenti të pamëshirshëm të Interpolit, rivalët e tij të biznesit dhe madje edhe disa nga klientët e tij, të cilët përfshijnë shumë nga diktatorët më famëkeq të botës. Së fundi, ai duhet të përballet edhe me ndërgjegjen e tij.",
+        video: "https://voe.sx/e/8zos9gdm35ba"
+      },
+
+    ];
+
+    let currentGenre = 'All';
+    let currentSearch = '';
+
+    const RATINGS_KEY = 'ratings_v2';
+    const REVIEWS_KEY = 'reviews_v1';
+
+    function getRatings(){ return JSON.parse(localStorage.getItem(RATINGS_KEY) || '{}'); }
+    function setRatings(o){ localStorage.setItem(RATINGS_KEY, JSON.stringify(o)); }
+    function getReviews(){ return JSON.parse(localStorage.getItem(REVIEWS_KEY) || '{}'); }
+    function setReviews(o){ localStorage.setItem(REVIEWS_KEY, JSON.stringify(o)); }
+
+    function getAverageFor(title){
+      const data = getRatings()[title];
+      if(!data || !data.users) return { avg: 0, count: 0 };
+      const vals = Object.values(data.users);
+      const count = vals.length;
+      const sum = vals.reduce((a,b)=>a+b,0);
+      return { avg: count ? +(sum/count).toFixed(2) : 0, count };
+    }
+    function getUserRating(title){
+      const user = localStorage.getItem('logged_user');
+      if(!user) return 0;
+      const data = getRatings()[title];
+      return (data && data.users && data.users[user]) || 0;
+    }
+    function escapeHTML(str){
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+    function timeAgo(ts){
+      const s = Math.floor((Date.now()-ts)/1000);
+      if (s < 5) return 'just now';
+      if (s < 60) return s + 's ago';
+      const m = Math.floor(s/60);
+      if (m < 60) return m + 'm ago';
+      const h = Math.floor(m/60);
+      if (h < 24) return h + 'h ago';
+      const d = Math.floor(h/24);
+      if (d < 7) return d + 'd ago';
+      return new Date(ts).toLocaleDateString();
+    }
+
+    function renderMovies(filter) {
+      currentGenre = filter || currentGenre;
+      const list = document.getElementById('movies-list');
+      list.innerHTML = '';
+
+      let filtered = currentGenre === 'All' ? movies : movies.filter(m => m.genre === currentGenre);
+      if (currentSearch.trim() !== '') {
+        filtered = filtered.filter(m => m.title.toLowerCase().includes(currentSearch.toLowerCase()));
+      }
+
+      filtered.forEach(movie => {
+        const { avg, count } = getAverageFor(movie.title);
+        const card = document.createElement('div');
+        card.className = 'movie-card';
+        card.setAttribute('data-title', movie.title);
+        card.innerHTML = `
+          <img src="${movie.image}" alt="${movie.title}">
+          <div class="movie-info">
+            <div class="movie-top">
+              <div class="movie-title">${movie.title}</div>
+              <button class="fav-heart-btn" data-fav="${movie.title}" title="Add to favorites">${isFav(movie.title) ? "♥" : "♡"}</button>
+            </div>
+            <div class="movie-genre">${movie.genre}</div>
+            <div class="movie-rating">★ ${count ? avg : '—'} ${count ? `<span class="rating-count">(${count})</span>` : ''}</div>
+            <div class="movie-desc">${movie.desc}</div>
+            <button class="play-btn">Play</button>
+          </div>
+        `;
+        card.querySelector('.play-btn').addEventListener('click', () => playMovie(movie.title));
+        card.querySelector('.fav-heart-btn').addEventListener('click', () => toggleFav(movie.title));
+        list.appendChild(card);
+      });
+      updateAllFavHearts();
+    }
+
+    (function setupCategoryMenu(){
+      const toggle = document.getElementById('category-toggle');
+      const menu = document.getElementById('category-menu');
+      const arrow = document.getElementById('cat-arrow');
+
+      toggle.addEventListener('click', () => {
+        const open = menu.style.display === 'block';
+        menu.style.display = open ? 'none' : 'block';
+        arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(90deg)';
+        toggle.setAttribute('aria-expanded', String(!open));
+      });
+
+      document.addEventListener('click', (e) => {
+        if (menu.style.display === 'block' && !menu.contains(e.target) && !toggle.contains(e.target)) {
+          menu.style.display = 'none';
+          arrow.style.transform = 'rotate(0deg)';
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    })();
+
+    function filterMovies(genre) {
+      document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+      const btn = Array.from(document.querySelectorAll('.category-btn')).find(b => b.textContent.trim().includes(genre));
+      if (btn) btn.classList.add('active');
+      renderMovies(genre);
+      const menu = document.getElementById('category-menu');
+      document.getElementById('cat-arrow').style.transform = 'rotate(0deg)';
+      menu.style.display = 'none';
+      document.getElementById('category-toggle').setAttribute('aria-expanded', 'false');
+    }
+
+    function searchMovies() {
+      currentSearch = document.getElementById('search-input').value;
+      renderMovies(currentGenre);
+    }
+    document.getElementById('search-input').addEventListener('input', searchMovies);
+
+    function paintStars(n){
+      const stars = document.querySelectorAll('#rating-stars .star');
+      stars.forEach((s, idx)=> s.classList.toggle('active', idx < n));
+    }
+    function updateRatingMeta(title){
+      const user = localStorage.getItem('logged_user');
+      const your = getUserRating(title);
+      const info = getAverageFor(title);
+      document.getElementById('your-rating').textContent = user ? `Your rating: ${your ? your + '/5' : '—'}` : 'Your rating: — (login to rate)';
+      document.getElementById('avg-rating').textContent = `Average: ${info.count ? info.avg + ' (' + info.count + ')' : '—'}`;
+    }
+    function setRating(title, value){
+      const user = localStorage.getItem('logged_user');
+      if(!user){ showAuth('login'); return; }
+      const db = getRatings();
+      if(!db[title]) db[title] = { users: {} };
+      db[title].users[user] = value;
+      setRatings(db);
+      paintStars(value);
+      updateRatingMeta(title);
+      renderMovies(currentGenre);
+    }
+    function renderEvaluation(title){
+      const starsWrap = document.getElementById('rating-stars');
+      starsWrap.innerHTML = '';
+      for(let i=1;i<=5;i++){
+        const b = document.createElement('button');
+        b.className = 'star'; b.textContent = '★'; b.setAttribute('data-star', i); b.setAttribute('aria-label', i + ' star');
+        b.addEventListener('mouseenter', ()=> paintStars(i));
+        b.addEventListener('mouseleave', ()=> paintStars(getUserRating(title)));
+        b.addEventListener('click', ()=> setRating(title, i));
+        starsWrap.appendChild(b);
+      }
+      paintStars(getUserRating(title));
+      updateRatingMeta(title);
+      setupReviewForm(title);
+      renderReviews(title);
+    }
+
+    function renderReviews(title){
+      const list = document.getElementById('reviews-list');
+      const countEl = document.getElementById('reviews-count');
+      const db = getReviews();
+      const arr = (db[title] || []).slice().sort((a,b)=>b.ts-a.ts);
+      countEl.textContent = arr.length ? `(${arr.length})` : '';
+      list.innerHTML = '';
+      if(arr.length === 0){
+        list.innerHTML = `<div class="empty">No reviews yet.</div>`;
+        return;
+      }
+      arr.forEach(r=>{
+        const item = document.createElement('div');
+        item.className = 'review-item';
+        const initials = encodeURIComponent(r.user || 'User');
+        const avatar = `https://ui-avatars.com/api/?name=${initials}&background=232323&color=ffd166&size=64&rounded=true`;
+        item.innerHTML = `
+          <img class="review-avatar" src="${avatar}" alt="${r.user}">
+          <div class="review-body">
+            <div class="review-meta"><span class="user">${r.user}</span> <span class="time">• ${timeAgo(r.ts)}</span></div>
+            <div class="review-text">${escapeHTML(r.text)}</div>
+          </div>
+        `;
+        const user = localStorage.getItem('logged_user');
+        if (user && user === r.user){
+          const del = document.createElement('button');
+          del.className = 'review-delete';
+          del.innerHTML = '🗑 Delete';
+          del.addEventListener('click', ()=>{
+            if(confirm('Delete your review?')){
+              const db2 = getReviews();
+              db2[title] = (db2[title] || []).filter(x=>x.id !== r.id);
+              setReviews(db2);
+              renderReviews(title);
+            }
+          });
+          item.appendChild(del);
+        }
+        list.appendChild(item);
+      });
+    }
+    function setupReviewForm(title){
+      const input = document.getElementById('review-input');
+      const btn = document.getElementById('review-submit');
+      const chars = document.getElementById('review-chars');
+      input.value = '';
+      chars.textContent = '0/400';
+      input.oninput = ()=>{
+        let t = input.value;
+        if (t.length > 400) { input.value = t.slice(0,400); }
+        chars.textContent = input.value.trim().length + '/400';
+      };
+      btn.onclick = ()=>{
+        const user = localStorage.getItem('logged_user');
+        if(!user){ showAuth('login'); return; }
+        const text = input.value.trim();
+        if(text.length < 5){ alert('Please write at least 5 characters.'); return; }
+        if(text.length > 400){ alert('Max 400 characters.'); return; }
+        const db = getReviews();
+        if(!db[title]) db[title] = [];
+        db[title].push({ id: Date.now().toString(36)+Math.random().toString(36).slice(2,8), user, text, ts: Date.now() });
+        setReviews(db);
+        input.value = ''; chars.textContent = '0/400';
+        renderReviews(title);
+      };
+    }
+
+    function playMovie(title) {
+      const movie = movies.find(m => m.title === title);
+      if (movie && movie.video) {
+        window.open(movie.video, '_blank');
+        return;
+      }
+    }
+    function closeModal() {
+      const modal = document.getElementById('movie-modal');
+      if (!modal) return;
+      modal.style.display = 'none';
+      const video = document.getElementById('modal-video');
+      const yt = document.getElementById('modal-yt');
+      try { video.pause(); } catch {}
+      video.style.display = 'none'; video.src = '';
+      yt.style.display = 'none'; yt.src = '';
+      document.getElementById('modal-img').style.display = 'block';
+    }
+    document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+    document.getElementById('movie-modal').addEventListener('click', (e)=>{
+      if (e.target.id === 'movie-modal') closeModal();
+    });
+
+    (function setupSideMenu(){
+      const menuToggle = document.getElementById('menu-toggle');
+      const sideMenu = document.getElementById('side-menu');
+      const closeBtn = document.getElementById('side-close-btn');
+
+      menuToggle.addEventListener('click', () => {
+        menuToggle.classList.add('animated');
+        setTimeout(() => sideMenu.classList.add('open'), 120);
+        setTimeout(() => menuToggle.classList.remove('animated'), 400);
+        renderAuthSection();
+        updateSignOutBtn();
+      });
+      closeBtn.addEventListener('click', () => {
+        sideMenu.classList.remove('open');
+        menuToggle.classList.add('animated');
+        setTimeout(() => menuToggle.classList.remove('animated'), 300);
+      });
+    })();
+
+    function getFavs() { return JSON.parse(localStorage.getItem('fav_movies') || '[]'); }
+    function setFavs(favs) { localStorage.setItem('fav_movies', JSON.stringify(favs)); }
+    function isFav(title) { return getFavs().includes(title); }
+    function toggleFav(title) {
+      let favs = getFavs();
+      if (favs.includes(title)) favs = favs.filter(t => t !== title);
+      else favs.push(title);
+      setFavs(favs);
+      updateFavList();
+      renderMovies(currentGenre);
+    }
+    function updateFavList() {
+      const favs = getFavs();
+      const favList = document.getElementById('fav-list');
+      const favEmpty = document.getElementById('fav-empty');
+      favList.innerHTML = '';
+      if (favs.length === 0) {
+        favEmpty.style.display = '';
+        return;
+      }
+      favEmpty.style.display = 'none';
+      favs.forEach(title => {
+        const movie = movies.find(m => m.title === title);
+        if (movie) {
+          const div = document.createElement('div');
+          div.innerHTML = `
+            <img src="${movie.image}" alt="${movie.title}">
+            <span style="flex:1">${movie.title}</span>
+            <button class="fav-heart-btn" title="Remove from favorites">♥</button>
+          `;
+          div.querySelector('button').addEventListener('click', () => toggleFav(movie.title));
+          favList.appendChild(div);
+               }
+      });
+    }
+    function toggleFavBox() {
+      const box = document.getElementById('fav-box');
+      box.style.display = box.style.display === 'none' || box.style.display === '' ? 'block' : 'none';
+      if (box.style.display === 'block') updateFavList();
+    }
+    document.getElementById('fav-close').addEventListener('click', toggleFavBox);
+    function updateAllFavHearts() {
+      document.querySelectorAll('.fav-heart-btn').forEach(btn => {
+        const title = btn.getAttribute('data-fav');
+        if (!title) return;
+        btn.textContent = isFav(title) ? "♥" : "♡";
+      });
+    }
+    document.addEventListener('click', function(e) {
+      const favBox = document.getElementById('fav-box');
+      if (!favBox) return;
+      const inside = favBox.contains(e.target) || e.target.closest('#side-menu');
+      if (favBox.style.display === 'block' && !inside) {
+        favBox.style.display = 'none';
+      }
+    });
+
+    function renderAuthSection() {
+      const authSection = document.getElementById('auth-section');
+      const user = localStorage.getItem('logged_user');
+      if (!user) {
+        authSection.innerHTML = `
+          <button id="btn-login">Login</button>
+          <button id="btn-signup">Sign Up</button>
+        `;
+        document.getElementById('btn-login').addEventListener('click', ()=>showAuth('login'));
+        document.getElementById('btn-signup').addEventListener('click', ()=>showAuth('signup'));
+      } else {
+        authSection.innerHTML = `<button id="btn-profile">View Profile</button>`;
+        document.getElementById('btn-profile').addEventListener('click', showProfile);
+      }
+    }
+    function showAuth(type) {
+      const modal = document.getElementById('auth-modal');
+      modal.style.display = 'flex';
+      document.getElementById('auth-title').textContent = (type === 'signup') ? 'Sign Up' : 'Login';
+      const form = document.getElementById('auth-form');
+      const msg = document.getElementById('auth-msg');
+      msg.textContent = '';
+      form.onsubmit = function(e) {
+        e.preventDefault();
+        const user = document.getElementById('auth-user').value.trim();
+        const pass = document.getElementById('auth-pass').value;
+        let text = '';
+        if (!user || !pass) { msg.textContent = 'Please fill in all fields.'; return; }
+        if (type === 'signup') {
+          if (localStorage.getItem('user_' + user)) text = 'User exists!';
+          else { localStorage.setItem('user_' + user, pass); text = 'Signed up!'; }
+        } else {
+          if (localStorage.getItem('user_' + user) === pass) text = 'Login successful!';
+          else text = 'Wrong credentials!';
+        }
+        msg.textContent = text;
+        if (text.includes('successful') || text === 'Signed up!') {
+          localStorage.setItem('logged_user', user);
+          setTimeout(() => {
+            closeAuth();
+            renderAuthSection();
+            updateSignOutBtn();
+          }, 800);
+        }
+      };
+    }
+    function closeAuth() {
+      const modal = document.getElementById('auth-modal');
+      if (modal) modal.style.display = 'none';
+    }
+    document.getElementById('auth-cancel').addEventListener('click', closeAuth);
+
+    function showProfile() {
+      const user = localStorage.getItem('logged_user');
+      if (!user) return;
+      document.getElementById('profile-username').textContent = user;
+      const pic = localStorage.getItem('profile_pic_' + user);
+      document.getElementById('profile-pic').src = pic || `https://ui-avatars.com/api/?name=${encodeURIComponent(user)}&background=ffe066&color=e50914&rounded=true&size=128`;
+      document.getElementById('profile-modal').style.display = 'flex';
+    }
+    function closeProfile() { document.getElementById('profile-modal').style.display = 'none'; }
+    document.getElementById('profile-close-btn').addEventListener('click', closeProfile);
+
+    function signOut() {
+      localStorage.removeItem('logged_user');
+      closeProfile();
+      renderAuthSection();
+      updateSignOutBtn();
+    }
+    document.getElementById('signout-btn').addEventListener('click', signOut);
+
+    function updateSignOutBtn() {
+      const user = localStorage.getItem('logged_user');
+      let btn = document.getElementById('side-signout-btn');
+      if (user) {
+        if (!btn) {
+          btn = document.createElement('button');
+          btn.id = 'side-signout-btn';
+          btn.textContent = 'Sign Out';
+          btn.style.marginTop = '2.5em';
+          btn.addEventListener('click', signOut);
+          document.getElementById('side-menu').appendChild(btn);
+        }
+        btn.style.display = 'block';
+      } else if (btn) {
+        btn.style.display = 'none';
+      }
+    }
+
+    document.getElementById('profile-pic-input').addEventListener('change', function(e) {
+     
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const user = localStorage.getItem('logged_user');
+        if (user) {
+          localStorage.setItem('profile_pic_' + user, evt.target.result);
+          document.getElementById('profile-pic').src = evt.target.result;
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('welcome-btn').addEventListener('click', () => {
+      const overlay = document.getElementById('welcome-overlay');
+      overlay.style.opacity = 0;
+      setTimeout(() => overlay.style.display = 'none', 700);
+    });
+
+    setInterval(() => {
+      const logoImg = document.querySelector('#main-logo img');
+      if (!logoImg) return;
+      logoImg.style.transform = 'translateY(-4px) scale(1.02)';
+      setTimeout(()=>{ logoImg.style.transform = ''; }, 900);
+    }, 5000);
+
+    // HUMAN VERIFICATION SCRIPT
+    (function(){
+      const HUMAN_KEY = 'human_verified_v1';
+
+      function setVerified(){
+        localStorage.setItem(HUMAN_KEY, '1');
+        const ov = document.getElementById('human-overlay');
+        if(!ov) return;
+        ov.classList.add('hidden');
+        setTimeout(()=>{ ov.style.display='none'; }, 450);
+      }
+
+      function setupHold(){
+        const btn = document.getElementById('hold-btn');
+        const fill = document.getElementById('hold-fill');
+        if(!btn || !fill) return;
+
+        const DURATION = 1600; // ms
+        let active = false, start = 0, raf = null;
+
+        const startHold = (e)=>{
+          e.preventDefault();
+          if(active) return;
+          active = true;
+          start = performance.now();
+          btn.classList.add('holding');
+          const step = (now)=>{
+            const pct = Math.min(1, (now - start) / DURATION);
+            fill.style.width = (pct * 100).toFixed(1) + '%';
+            if(pct >= 1){
+              done();
+            }else{
+              raf = requestAnimationFrame(step);
+            }
+          };
+          raf = requestAnimationFrame(step);
+        };
+        const endHold = ()=>{
+          if(!active) return;
+          active = false;
+          btn.classList.remove('holding');
+          if(raf) cancelAnimationFrame(raf);
+          raf = null;
+          fill.style.width = '0%';
+        };
+        const done = ()=>{
+          active = false;
+          if(raf) cancelAnimationFrame(raf);
+          raf = null;
+          fill.style.width = '100%';
+          setTimeout(setVerified, 150);
+        };
+
+        btn.addEventListener('pointerdown', startHold, { passive:false });
+        btn.addEventListener('pointerup', endHold);
+        btn.addEventListener('pointerleave', endHold);
+        btn.addEventListener('keydown', (e)=>{
+          if(e.code === 'Space' || e.key === ' '){ startHold(e); }
+        });
+        btn.addEventListener('keyup', (e)=>{
+          if(e.code === 'Space' || e.key === ' '){ endHold(); }
+        });
+      }
+
+      function setupPuzzle(){
+        const aEl = document.getElementById('pz-a');
+        const bEl = document.getElementById('pz-b');
+        const input = document.getElementById('pz-input');
+        const check = document.getElementById('pz-check');
+        const msg = document.getElementById('pz-msg');
+        if(!aEl || !bEl || !input || !check) return;
+
+        let A=0, B=0, SUM=0;
+        function newQ(){
+          A = 2 + Math.floor(Math.random()*8);
+          B = 2 + Math.floor(Math.random()*8);
+          SUM = A + B;
+          aEl.textContent = A;
+          bEl.textContent = B;
+          input.value = '';
+          msg.textContent = '';
+          msg.style.color = '';
+        }
+        check.addEventListener('click', ()=>{
+          const v = parseInt(input.value, 10);
+          if(!Number.isFinite(v)){
+            msg.textContent = 'Shkruaj një numër.';
+            msg.style.color = '#ff7b82';
+            return;
+          }
+          if(v === SUM){
+            msg.textContent = 'Verifikuar ✓';
+            msg.style.color = 'var(--ok)';
+            setTimeout(setVerified, 250);
+          }else{
+            msg.textContent = 'Gabim, provo përsëri.';
+            msg.style.color = '#ff7b82';
+            newQ();
+          }
+        });
+        input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') check.click(); });
+        newQ();
+      }
+
+      window.initHumanGate = function initHumanGate(){
+        const ov = document.getElementById('human-overlay');
+        if(!ov) return;
+        if(localStorage.getItem(HUMAN_KEY) === '1'){
+          ov.style.display = 'none';
+          return;
+        }
+        ov.style.display = 'flex';
+        setupHold();
+        setupPuzzle();
+      };
+    })();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initHumanGate(); // show human gate if not verified
+      renderMovies('All');
+      updateFavList();
+      renderAuthSection();
+      updateSignOutBtn();
+    });
+  </script>
+</body>
+</html>
